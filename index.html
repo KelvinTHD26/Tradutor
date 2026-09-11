@@ -199,8 +199,8 @@ textarea::placeholder{ font-family:'EB Garamond', serif; font-style:italic; colo
 .output-empty{ color:#8a7d5f; font-style:italic; font-size:1rem; text-align:center; padding:18px 0; font-family:'EB Garamond', serif; }
 .glyph-line{
   font-family:'Cronicas', serif; font-size:2.1rem; line-height:1.7;
-  color:#241b0f; direction:rtl; word-spacing:.5em; letter-spacing:.02em;
-  overflow-wrap:break-word; word-break:break-word;
+  color:#241b0f; word-spacing:.5em; letter-spacing:.02em; text-align:right;
+  overflow-wrap:break-word; word-break:break-word; white-space:pre-wrap;
 }
 .plain-line{
   font-family:'EB Garamond', serif; font-size:1.4rem; font-style:italic;
@@ -326,7 +326,6 @@ footer{ text-align:center; margin-top:28px; color:var(--teal-dim); font-size:.83
 
 <script>
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-function reverseWord(word){ return word.split("").reverse().join(""); }
 
 // ---- mode switching ----
 const btnEncode = document.getElementById("btnEncode");
@@ -349,6 +348,8 @@ function playInk(el){
   el.classList.add("ink-in");
 }
 
+function reverseText(text){ return text.split("").reverse().join(""); }
+
 // ---- encode ----
 function renderEncode(){
   const text = document.getElementById("inputEncode").value.trim();
@@ -357,10 +358,9 @@ function renderEncode(){
     output.innerHTML = '<p class="output-empty">O texto traduzido aparece aqui.</p>';
     return;
   }
-  const words = text.split(/\s+/).filter(Boolean);
   const line = document.createElement("div");
   line.className = "glyph-line";
-  line.innerHTML = words.map(w => `<span style="direction:ltr;display:inline-block;">${reverseWord(w)}</span>`).join(" ");
+  line.textContent = reverseText(text);
   output.innerHTML = "";
   output.appendChild(line);
   playInk(line);
@@ -375,11 +375,9 @@ function renderDecode(){
     output.innerHTML = '<p class="output-empty">O texto decifrado aparece aqui.</p>';
     return;
   }
-  const words = text.split(/\s+/).filter(Boolean);
-  const decoded = words.map(reverseWord).join(" ");
   const line = document.createElement("div");
   line.className = "plain-line";
-  line.textContent = decoded;
+  line.textContent = reverseText(text);
   output.innerHTML = "";
   output.appendChild(line);
   playInk(line);
@@ -388,7 +386,7 @@ document.getElementById("inputDecode").addEventListener("input", renderDecode);
 
 document.getElementById("btnInvert").addEventListener("click", () => {
   const field = document.getElementById("inputDecode");
-  field.value = field.value.split("").reverse().join("");
+  field.value = reverseText(field.value);
   renderDecode();
   field.focus();
 });
@@ -411,13 +409,11 @@ function wireCopy(btnId, getText){
 }
 wireCopy("copyEncode", () => {
   const text = document.getElementById("inputEncode").value.trim();
-  if(!text) return "";
-  return text.split(/\s+/).filter(Boolean).map(reverseWord).join(" ");
+  return text ? reverseText(text) : "";
 });
 wireCopy("copyDecode", () => {
   const text = document.getElementById("inputDecode").value.trim();
-  if(!text) return "";
-  return text.split(/\s+/).filter(Boolean).map(reverseWord).join(" ");
+  return text ? reverseText(text) : "";
 });
 
 // ---- key chart ----
