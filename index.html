@@ -83,7 +83,7 @@ h1{
 }
 
 .switch{
-  display:flex; justify-content:center; gap:0; margin:34px auto 0;
+  display:flex; justify-content:center; gap:0; margin:34px auto 40px;
   width:fit-content; border:1px solid var(--line); border-radius:3px; overflow:hidden;
 }
 .switch button{
@@ -95,11 +95,31 @@ h1{
 .switch button.active{ background:var(--void-3); color:var(--teal); box-shadow:inset 0 0 18px rgba(57,232,200,.15); }
 .switch button:hover:not(.active){ color:var(--ink); }
 
-.layout{
-  display:grid; grid-template-columns:1fr; gap:26px; margin-top:0; align-items:start;
+.layout-controls{
+  display:flex; justify-content:flex-end; align-items:center; gap:10px;
+  margin:0 0 14px;
 }
-@media (min-width:920px){
-  .layout{ grid-template-columns:1fr 250px; }
+.layout-controls span{
+  font-family:'Cinzel', serif; font-size:.64rem; letter-spacing:.1em; color:var(--teal-dim);
+}
+.layout-controls .pos-toggle{
+  display:flex; border:1px solid var(--line); border-radius:3px; overflow:hidden;
+}
+.layout-controls .pos-toggle button{
+  font-family:'Cinzel', serif; font-size:.64rem; letter-spacing:.08em;
+  background:var(--void-2); color:var(--teal-dim); border:none;
+  padding:8px 14px; cursor:pointer; transition:background .2s,color .2s;
+}
+.layout-controls .pos-toggle button + button{ border-left:1px solid var(--line); }
+.layout-controls .pos-toggle button.active{ background:var(--void-3); color:var(--teal); }
+
+.layout{
+  display:grid; grid-template-columns:1fr; gap:30px; margin-top:0; align-items:start;
+}
+.layout.pos-side{ grid-template-columns:1fr 250px; }
+.layout.pos-below{ grid-template-columns:1fr; }
+@media (max-width:720px){
+  .layout.pos-side{ grid-template-columns:1fr; }
 }
 
 .card{
@@ -238,7 +258,15 @@ footer{ text-align:center; margin-top:28px; color:var(--teal-dim); font-size:.83
     <button id="btnDecode">Símbolos → Texto</button>
   </div>
 
-  <div class="layout">
+  <div class="layout-controls">
+    <span>Chave do alfabeto</span>
+    <div class="pos-toggle">
+      <button type="button" id="posSide" class="active">Do lado</button>
+      <button type="button" id="posBelow">Embaixo</button>
+    </div>
+  </div>
+
+  <div class="layout pos-side" id="layout">
     <div class="card">
 
       <!-- ENCODE PANEL -->
@@ -397,13 +425,22 @@ document.getElementById("keyGrid").innerHTML = ALPHABET.split("").map(l => `
   <div class="keycell"><span class="sym">${l}</span><span class="norm">${l}</span></div>
 `).join("");
 
-// keep key panel open on desktop widths
+// ---- key chart position toggle ----
+const layoutEl = document.getElementById("layout");
 const keyPanel = document.getElementById("keyPanel");
-function syncKeyPanel(){
-  if(window.matchMedia("(min-width:920px)").matches){ keyPanel.setAttribute("open",""); }
+const posSideBtn = document.getElementById("posSide");
+const posBelowBtn = document.getElementById("posBelow");
+
+function setLayoutPos(pos){
+  layoutEl.classList.remove("pos-side","pos-below");
+  layoutEl.classList.add(pos);
+  posSideBtn.classList.toggle("active", pos === "pos-side");
+  posBelowBtn.classList.toggle("active", pos === "pos-below");
+  if(pos === "pos-side"){ keyPanel.setAttribute("open",""); }
 }
-syncKeyPanel();
-window.addEventListener("resize", syncKeyPanel);
+posSideBtn.addEventListener("click", () => setLayoutPos("pos-side"));
+posBelowBtn.addEventListener("click", () => setLayoutPos("pos-below"));
+setLayoutPos("pos-side");
 
 // ---- particles ----
 const particleField = document.getElementById("particles");
