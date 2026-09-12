@@ -47,6 +47,9 @@ body{
   background:radial-gradient(circle, rgba(57,232,200,.9) 0%, rgba(57,232,200,0) 70%);
   animation:drift linear infinite;
 }
+.particle.ember{
+  background:radial-gradient(circle, rgba(216,171,90,.85) 0%, rgba(216,171,90,0) 70%);
+}
 @keyframes drift{
   0%{ transform:translateY(0) translateX(0); opacity:0; }
   10%{ opacity:.7; }
@@ -62,7 +65,7 @@ body{
 }
 .page{ width:100%; max-width:780px; }
 
-header{ text-align:center; margin-bottom:40px; }
+header{ text-align:center; margin-bottom:40px; position:relative; }
 .eyebrow{
   font-family:'Cronicas', serif;
   font-size:1.5rem;
@@ -71,12 +74,25 @@ header{ text-align:center; margin-bottom:40px; }
   margin-bottom:22px;
   opacity:.9;
   text-shadow:0 0 20px rgba(61,255,160,.45);
+  animation:eyebrowPulse 4.5s ease-in-out infinite;
 }
+@keyframes eyebrowPulse{
+  0%,100%{ text-shadow:0 0 20px rgba(61,255,160,.45); opacity:.9; }
+  50%{ text-shadow:0 0 32px rgba(61,255,160,.7); opacity:1; }
+}
+@media (prefers-reduced-motion:reduce){ .eyebrow{ animation:none; } }
 h1{
   font-family:'Cinzel', serif; font-weight:700; font-size:2.15rem;
-  letter-spacing:.03em; margin:0 0 12px; color:var(--ink);
+  letter-spacing:.03em; margin:0 0 18px; color:var(--ink);
   text-shadow:0 0 30px rgba(57,232,200,.12);
 }
+.header-flourish{
+  display:flex; align-items:center; justify-content:center; gap:12px;
+  margin:0 auto 24px; width:100%; max-width:340px; color:var(--line);
+}
+.header-flourish::before,.header-flourish::after{ content:""; flex:1; height:1px; background:linear-gradient(90deg, transparent, var(--line)); }
+.header-flourish::after{ background:linear-gradient(90deg, var(--line), transparent); }
+.header-flourish svg{ width:13px; height:13px; flex:none; opacity:.8; fill:var(--teal-dim); }
 .sub{
   font-style:italic; color:var(--teal-soft); font-size:1.05rem;
   margin:0 auto; max-width:46ch; line-height:1.55; text-align:center;
@@ -89,11 +105,11 @@ h1{
 .switch button{
   font-family:'Cinzel', serif; font-size:.72rem; letter-spacing:.1em;
   background:var(--void-2); color:var(--teal-dim); border:none;
-  padding:13px 22px; cursor:pointer; transition:background .2s, color .2s;
+  padding:13px 22px; cursor:pointer; transition:background .25s, color .25s, box-shadow .25s;
 }
 .switch button + button{ border-left:1px solid var(--line); }
 .switch button.active{ background:var(--void-3); color:var(--teal); box-shadow:inset 0 0 18px rgba(57,232,200,.15); }
-.switch button:hover:not(.active){ color:var(--ink); }
+.switch button:hover:not(.active){ color:var(--ink); background:#0d1a17; box-shadow:inset 0 0 12px rgba(57,232,200,.08); }
 
 .layout-controls{
   display:flex; justify-content:flex-end; align-items:center; gap:10px;
@@ -129,8 +145,29 @@ h1{
     unbreakable string (e.g. no spaces) force this track wider than its
     1fr share instead of wrapping — this line lets it shrink to fit so
     overflow-wrap can actually do its job and the sidebar column stays put */
+  box-shadow:0 20px 50px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.02);
+  transition:box-shadow .3s ease;
 }
 .card::before{ content:""; position:absolute; inset:9px; border:1px solid var(--line-soft); pointer-events:none; }
+
+/* ---- corner ornaments (decorative only) ---- */
+.corner-ornaments{ position:absolute; inset:0; pointer-events:none; z-index:1; }
+.corner-ornaments span{
+  position:absolute; width:20px; height:20px;
+  border:1px solid var(--teal-dim); opacity:.55;
+}
+.corner-ornaments span::after{
+  content:""; position:absolute; width:4px; height:4px; border-radius:50%;
+  background:var(--teal); box-shadow:0 0 6px 1px rgba(57,232,200,.7);
+}
+.corner-ornaments .tl{ top:0; left:0; border-right:none; border-bottom:none; }
+.corner-ornaments .tl::after{ top:-2px; left:-2px; }
+.corner-ornaments .tr{ top:0; right:0; border-left:none; border-bottom:none; }
+.corner-ornaments .tr::after{ top:-2px; right:-2px; }
+.corner-ornaments .bl{ bottom:0; left:0; border-right:none; border-top:none; }
+.corner-ornaments .bl::after{ bottom:-2px; left:-2px; }
+.corner-ornaments .br{ bottom:0; right:0; border-left:none; border-top:none; }
+.corner-ornaments .br::after{ bottom:-2px; right:-2px; }
 
 .panel{ display:none; }
 .panel.active{ display:block; }
@@ -152,9 +189,11 @@ textarea::placeholder{ font-family:'EB Garamond', serif; font-style:italic; colo
   display:inline-flex; align-items:center; gap:8px;
   margin-top:12px; background:none; border:1px solid var(--line);
   color:var(--teal-dim); font-family:'Cinzel', serif; font-size:.68rem; letter-spacing:.08em;
-  padding:9px 16px; border-radius:2px; cursor:pointer; transition:border-color .2s, color .2s;
+  padding:9px 16px; border-radius:2px; cursor:pointer;
+  transition:border-color .25s, color .25s, box-shadow .25s, transform .15s;
 }
-.invert-btn:hover{ border-color:var(--teal); color:var(--ink); }
+.invert-btn:hover{ border-color:var(--teal); color:var(--ink); box-shadow:0 0 14px rgba(57,232,200,.18); }
+.invert-btn:active{ transform:scale(.97); }
 .invert-btn svg{ flex:none; }
 
 .divider{ display:flex; align-items:center; gap:14px; margin:26px 0; color:var(--line); }
@@ -189,6 +228,38 @@ textarea::placeholder{ font-family:'EB Garamond', serif; font-style:italic; colo
   mix-blend-mode:multiply;
   pointer-events:none;
 }
+.wax-seal{
+  position:absolute; bottom:-16px; left:26px; z-index:2; pointer-events:none;
+  width:50px; height:50px;
+  border-radius:46% 54% 51% 49% / 44% 49% 51% 56%;
+  background:
+    radial-gradient(circle at 30% 26%, rgba(255,255,255,.22) 0%, transparent 30%),
+    radial-gradient(circle at 68% 74%, rgba(0,0,0,.25) 0%, transparent 45%),
+    radial-gradient(circle at 38% 34%, #9c3348 0%, #7a1f31 38%, #591525 62%, #3a0d18 85%, #2a0810 100%);
+  box-shadow:
+    0 8px 16px rgba(0,0,0,.5),
+    inset 0 3px 5px rgba(255,255,255,.18),
+    inset 0 -7px 11px rgba(0,0,0,.55),
+    inset 4px -3px 7px rgba(0,0,0,.3);
+  display:flex; align-items:center; justify-content:center;
+  transform:rotate(-8deg);
+}
+.wax-seal::before,.wax-seal::after{
+  content:""; position:absolute; z-index:-1;
+  border-radius:50% 50% 45% 55% / 55% 45% 55% 45%;
+  background:radial-gradient(circle at 35% 30%, #7a1f31, #3a0d18 80%);
+  box-shadow:inset 0 2px 3px rgba(255,255,255,.12), inset 0 -3px 5px rgba(0,0,0,.5);
+}
+.wax-seal::before{ width:15px; height:12px; bottom:-3px; left:2px; opacity:.92; }
+.wax-seal::after{ width:11px; height:9px; bottom:-5px; right:6px; opacity:.85; }
+.wax-seal svg{
+  width:24px; height:24px; opacity:.9; position:relative;
+  fill:rgba(0,0,0,.4); stroke:none;
+  filter:
+    drop-shadow(-1px -1px 0.5px rgba(255,255,255,.28))
+    drop-shadow(1.5px 1.5px 1.5px rgba(0,0,0,.65));
+}
+@media (max-width:480px){ .wax-seal{ width:40px; height:40px; left:16px; bottom:-12px; } .wax-seal svg{ width:19px; height:19px; } }
 .copy-btn-group{
   position:absolute; top:14px; right:18px; z-index:2;
   display:flex; align-items:center; gap:8px;
@@ -197,11 +268,13 @@ textarea::placeholder{ font-family:'EB Garamond', serif; font-style:italic; colo
   display:flex; align-items:center; gap:6px;
   background:rgba(20,16,8,.08); border:1px solid rgba(40,30,15,.35);
   color:#4a3d24; font-family:'Cinzel', serif; font-size:.62rem; letter-spacing:.08em;
-  padding:7px 11px; border-radius:2px; cursor:pointer; transition:background .2s;
+  padding:7px 11px; border-radius:2px; cursor:pointer;
+  transition:background .2s, box-shadow .2s, transform .15s;
 }
-.copy-btn:hover{ background:rgba(20,16,8,.16); }
+.copy-btn:hover{ background:rgba(20,16,8,.16); box-shadow:0 2px 8px rgba(0,0,0,.18); }
+.copy-btn:active{ transform:scale(.96); }
 .copy-btn svg{ width:12px; height:12px; flex:none; }
-.copy-btn.copied{ color:#2a5a44; border-color:#2a5a44; }
+.copy-btn.copied{ color:#2a5a44; border-color:#2a5a44; box-shadow:0 0 10px rgba(42,90,68,.35); }
 
 .output-empty{ color:#8a7d5f; font-style:italic; font-size:1rem; text-align:center; padding:18px 0; font-family:'EB Garamond', serif; }
 .glyph-line{
@@ -240,11 +313,18 @@ textarea::placeholder{ font-family:'EB Garamond', serif; font-style:italic; colo
 .keycell{
   display:flex; flex-direction:column; align-items:center; gap:5px;
   background:var(--void-2); border:1px solid var(--line-soft); border-radius:2px; padding:9px 3px;
+  transition:border-color .2s, box-shadow .2s, transform .2s;
 }
-.keycell .sym{ font-family:'Cronicas', serif; font-size:1.3rem; color:var(--teal); }
+.keycell:hover{
+  border-color:var(--teal-dim); box-shadow:0 0 12px rgba(57,232,200,.15);
+  transform:translateY(-2px);
+}
+.keycell .sym{ font-family:'Cronicas', serif; font-size:1.3rem; color:var(--teal); transition:text-shadow .2s; }
+.keycell:hover .sym{ text-shadow:0 0 10px rgba(57,232,200,.6); }
 .keycell .norm{ font-family:'Cinzel', serif; font-size:.62rem; letter-spacing:.05em; color:var(--teal-dim); }
 
 footer{ text-align:center; margin-top:28px; color:var(--teal-dim); font-size:.83rem; font-style:italic; opacity:.8; }
+footer .foot-mark{ display:inline-block; margin:0 10px; opacity:.6; transform:translateY(-1px); }
 
 @media (max-width:480px){ .card{padding:22px 18px;} h1{font-size:1.7rem;} .switch button{padding:12px 16px;font-size:.66rem;} .output-wrap{padding:30px 20px;} }
 </style>
@@ -257,6 +337,9 @@ footer{ text-align:center; margin-top:28px; color:var(--teal-dim); font-size:.83
   <header>
     <div class="eyebrow">RIZUDART</div>
     <h1>Crônicas do Vazio Atômico</h1>
+    <div class="header-flourish" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" stroke="none"/></svg>
+    </div>
     <p class="sub">Ferramenta de tradução para o alfabeto de Crônicas do Vazio Atômico. Útil pra escrever pistas, bilhetes e anotações de sessão.</p>
   </header>
 
@@ -275,6 +358,9 @@ footer{ text-align:center; margin-top:28px; color:var(--teal-dim); font-size:.83
 
   <div class="layout pos-side" id="layout">
     <div class="card">
+      <div class="corner-ornaments" aria-hidden="true">
+        <span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span>
+      </div>
 
       <!-- ENCODE PANEL -->
       <div class="panel active" id="panelEncode">
@@ -293,6 +379,9 @@ footer{ text-align:center; margin-top:28px; color:var(--teal-dim); font-size:.83
               </button>
             </div>
             <div id="outputEncode"><p class="output-empty">O texto traduzido aparece aqui.</p></div>
+            <div class="wax-seal" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 3 L14 9 L20 10 L14 13 L12 20 L10 13 L4 10 L10 9 Z"/></svg>
+            </div>
           </div>
         </div>
         <p class="reading-note">← sentido de leitura</p>
@@ -326,12 +415,15 @@ footer{ text-align:center; margin-top:28px; color:var(--teal-dim); font-size:.83
     </div>
 
     <details class="keypanel" id="keyPanel">
+      <div class="corner-ornaments" aria-hidden="true">
+        <span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span>
+      </div>
       <summary>Chave do alfabeto</summary>
       <div class="keygrid" id="keyGrid"></div>
     </details>
   </div>
 
-  <footer>cada palavra se dobra sobre si mesma · lida do fim para o início</footer>
+  <footer><span class="foot-mark" aria-hidden="true">✦</span>cada palavra se dobra sobre si mesma · lida do fim para o início<span class="foot-mark" aria-hidden="true">✦</span></footer>
 </div>
 </div>
 
@@ -528,6 +620,83 @@ wireCopy("copyDecode", () => {
 });
 
 // ---- copy as image (for pasting where the Cronicas font isn't installed) ----
+function tearClipPath(ctx, x0, y0, w, h){
+  const topPts = [
+    [0,2],[3,0],[9,1.5],[15,0],[22,1.2],[29,0],[36,1.5],[44,0.3],[52,1.6],
+    [60,0],[68,1.2],[76,0],[84,1.4],[92,0.2],[100,1.5]
+  ];
+  const bottomPts = [
+    [100,98],[96,100],[89,98.4],[82,100],[74,98.6],[66,100],[58,98.3],
+    [50,100],[42,98.5],[34,100],[26,98.7],[18,100],[10,98.4],[3,100],[0,98.2]
+  ];
+  ctx.beginPath();
+  topPts.forEach(([px,py],i)=>{
+    const X = x0 + w*px/100, Y = y0 + h*py/100;
+    if(i===0) ctx.moveTo(X,Y); else ctx.lineTo(X,Y);
+  });
+  bottomPts.forEach(([px,py])=>{
+    ctx.lineTo(x0 + w*px/100, y0 + h*py/100);
+  });
+  ctx.closePath();
+}
+
+function makeGrainPattern(ctx){
+  const n = document.createElement("canvas");
+  n.width = 90; n.height = 90;
+  const nctx = n.getContext("2d");
+  const img = nctx.createImageData(90, 90);
+  for(let i=0;i<img.data.length;i+=4){
+    const v = Math.random() * 255;
+    img.data[i] = img.data[i+1] = img.data[i+2] = v;
+    img.data[i+3] = Math.random() * 26; // low alpha speckle
+  }
+  nctx.putImageData(img, 0, 0);
+  return ctx.createPattern(n, "repeat");
+}
+
+function drawWaxSeal(ctx, cx, cy, r){
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(-8 * Math.PI/180);
+
+  // two small drips peeking from behind the main blob
+  ctx.beginPath(); ctx.ellipse(-r*0.55, r*0.72, r*0.28, r*0.22, 0, 0, Math.PI*2); ctx.fillStyle = "#3a0d18"; ctx.fill();
+  ctx.beginPath(); ctx.ellipse(r*0.35, r*0.8, r*0.2, r*0.16, 0, 0, Math.PI*2); ctx.fill();
+
+  // main irregular blob
+  ctx.beginPath();
+  ctx.ellipse(0, 0, r, r*0.96, 0.15, 0, Math.PI*2);
+  const g = ctx.createRadialGradient(-r*0.3,-r*0.32, r*0.1, 0,0, r*1.1);
+  g.addColorStop(0, "#a4384d");
+  g.addColorStop(0.35, "#7a1f31");
+  g.addColorStop(0.65, "#591525");
+  g.addColorStop(1, "#2a0810");
+  ctx.fillStyle = g;
+  ctx.fill();
+
+  // rim highlight + shade for a pressed, glossy wax look
+  ctx.save();
+  ctx.clip();
+  ctx.beginPath(); ctx.ellipse(-r*0.35,-r*0.4, r*0.9, r*0.55, 0.3, 0, Math.PI*2);
+  ctx.fillStyle = "rgba(255,255,255,.16)"; ctx.fill();
+  ctx.beginPath(); ctx.ellipse(r*0.4, r*0.45, r*0.95, r*0.6, 0.3, 0, Math.PI*2);
+  ctx.fillStyle = "rgba(0,0,0,.28)"; ctx.fill();
+  ctx.restore();
+
+  // engraved emblem (four-point star), simulated with offset light/dark copies
+  const starPath = () => {
+    const p = new Path2D("M0 -9 L2.2 -2.4 L9 0 L2.2 2.2 L0 9 L-2.2 2.2 L-9 0 L-2.2 -2.4 Z");
+    return p;
+  };
+  ctx.save();
+  ctx.scale(r/13, r/13);
+  ctx.translate(1.1, 1.1); ctx.fillStyle = "rgba(255,255,255,.22)"; ctx.fill(starPath());
+  ctx.translate(-2.2, -2.2); ctx.fillStyle = "rgba(0,0,0,.55)"; ctx.fill(starPath());
+  ctx.restore();
+
+  ctx.restore();
+}
+
 async function textToImageBlob(glyphText){
   await document.fonts.load("64px Cronicas");
   await document.fonts.ready;
@@ -562,32 +731,89 @@ async function textToImageBlob(glyphText){
   let widest = 0;
   for(const l of lines) widest = Math.max(widest, mctx.measureText(l).width);
 
+  const cardW = Math.ceil(widest + paddingX * 2);
+  const cardH = Math.ceil(lines.length * lineHeight + paddingY * 2 + 14);
+  const margin = 46; // room for drop shadow + wax seal spill
+  const width = cardW + margin * 2;
+  const height = cardH + margin * 2 + 16;
+
   const canvas = document.createElement("canvas");
   const scale = 2; // sharper export
-  const width = Math.ceil(widest + paddingX * 2);
-  const height = Math.ceil(lines.length * lineHeight + paddingY * 2);
   canvas.width = width * scale;
   canvas.height = height * scale;
   const ctx = canvas.getContext("2d");
   ctx.scale(scale, scale);
 
-  // parchment-ish background
-  const grad = ctx.createLinearGradient(0, 0, width, height);
+  // drop shadow, cast by the torn-paper silhouette
+  ctx.save();
+  ctx.shadowColor = "rgba(0,0,0,.5)";
+  ctx.shadowBlur = 22;
+  ctx.shadowOffsetY = 10;
+  tearClipPath(ctx, margin, margin, cardW, cardH);
+  ctx.fillStyle = "#ddd0aa";
+  ctx.fill();
+  ctx.restore();
+
+  // clip to the torn shape and paint parchment inside it
+  ctx.save();
+  tearClipPath(ctx, margin, margin, cardW, cardH);
+  ctx.clip();
+
+  const grad = ctx.createLinearGradient(margin, margin, margin + cardW, margin + cardH);
   grad.addColorStop(0, "#e9dfc0");
   grad.addColorStop(1, "#ddd0aa");
   ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, width, height);
-  ctx.strokeStyle = "rgba(40,30,15,.35)";
-  ctx.lineWidth = 2;
-  ctx.strokeRect(1, 1, width - 2, height - 2);
+  ctx.fillRect(margin, margin, cardW, cardH);
 
+  const warm1 = ctx.createRadialGradient(
+    margin + cardW*0.2, margin + cardH*0.15, 1,
+    margin + cardW*0.2, margin + cardH*0.15, cardW*0.42
+  );
+  warm1.addColorStop(0, "rgba(120,100,60,.14)");
+  warm1.addColorStop(1, "rgba(120,100,60,0)");
+  ctx.fillStyle = warm1;
+  ctx.fillRect(margin, margin, cardW, cardH);
+
+  const warm2 = ctx.createRadialGradient(
+    margin + cardW*0.85, margin + cardH*0.8, 1,
+    margin + cardW*0.85, margin + cardH*0.8, cardW*0.38
+  );
+  warm2.addColorStop(0, "rgba(90,75,45,.16)");
+  warm2.addColorStop(1, "rgba(90,75,45,0)");
+  ctx.fillStyle = warm2;
+  ctx.fillRect(margin, margin, cardW, cardH);
+
+  // faint ruled lines, like the on-page parchment
+  ctx.strokeStyle = "rgba(0,0,0,.07)";
+  ctx.lineWidth = 1;
+  for(let y = margin + 27; y < margin + cardH; y += 27){
+    ctx.beginPath(); ctx.moveTo(margin, y); ctx.lineTo(margin + cardW, y); ctx.stroke();
+  }
+
+  // paper grain
+  ctx.fillStyle = makeGrainPattern(ctx);
+  ctx.fillRect(margin, margin, cardW, cardH);
+
+  // the glyph text itself
   ctx.font = `${fontSize}px Cronicas, serif`;
   ctx.fillStyle = "#241b0f";
   ctx.textBaseline = "middle";
   ctx.textAlign = "right";
   lines.forEach((l, i) => {
-    ctx.fillText(l, width - paddingX, paddingY + lineHeight * i + lineHeight / 2);
+    ctx.fillText(l, margin + cardW - paddingX, margin + paddingY + lineHeight * i + lineHeight / 2);
   });
+  ctx.restore();
+
+  // subtle inked edge around the torn silhouette
+  ctx.save();
+  tearClipPath(ctx, margin, margin, cardW, cardH);
+  ctx.strokeStyle = "rgba(40,30,15,.3)";
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+  ctx.restore();
+
+  // wax seal, stamped over the bottom-left edge
+  drawWaxSeal(ctx, margin + cardW*0.09, margin + cardH - 6, 25);
 
   return new Promise(resolve => canvas.toBlob(resolve, "image/png"));
 }
@@ -656,7 +882,7 @@ const particleField = document.getElementById("particles");
 const N = 16;
 for(let i=0;i<N;i++){
   const p = document.createElement("div");
-  p.className = "particle";
+  p.className = "particle" + (i % 5 === 0 ? " ember" : "");
   const size = 2 + Math.random()*3;
   const left = Math.random()*100;
   const duration = 14 + Math.random()*14;
