@@ -181,7 +181,7 @@ textarea{
   color:var(--ink); font-family:'EB Garamond', serif; font-size:1.15rem;
   padding:14px 16px; resize:vertical; border-radius:1px; line-height:1.5;
 }
-textarea.cipher-input{ font-family:'Cronicas', serif; font-size:1.5rem; letter-spacing:.03em; min-height:80px; }
+textarea.cipher-input{ font-family:'Cronicas', serif; font-size:1.5rem; letter-spacing:.03em; min-height:80px; direction:rtl; unicode-bidi:bidi-override; text-align:right; }
 textarea:focus{ outline:none; border-color:var(--teal); }
 textarea::placeholder{ font-family:'EB Garamond', serif; font-style:italic; color:#3f5851; font-size:1rem; }
 
@@ -390,7 +390,7 @@ footer .foot-mark{ display:inline-block; margin:0 10px; opacity:.6; transform:tr
       <!-- DECODE PANEL -->
       <div class="panel" id="panelDecode">
         <label for="inputDecode">Símbolos (digite usando o alfabeto normal — veja a chave)</label>
-        <textarea id="inputDecode" class="cipher-input" placeholder="ex: nivlek"></textarea>
+        <textarea id="inputDecode" class="cipher-input" dir="rtl" placeholder="ex: nivlek"></textarea>
         <button type="button" id="btnInvert" class="invert-btn">
           <svg viewBox="0 0 24 24" width="15" height="15"><path d="M7 7h11M18 7l-3-3M18 7l-3 3M17 17H6M6 17l3-3M6 17l3 3" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Inverter ordem digitada
