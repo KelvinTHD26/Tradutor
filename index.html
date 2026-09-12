@@ -125,6 +125,10 @@ h1{
 .card{
   background:linear-gradient(180deg, #0c1613, #080f0d);
   border:1px solid var(--line); border-radius:2px; padding:34px; position:relative;
+  min-width:0; /* grid items default to min-width:auto, which lets an
+    unbreakable string (e.g. no spaces) force this track wider than its
+    1fr share instead of wrapping — this line lets it shrink to fit so
+    overflow-wrap can actually do its job and the sidebar column stays put */
 }
 .card::before{ content:""; position:absolute; inset:9px; border:1px solid var(--line-soft); pointer-events:none; }
 
@@ -202,7 +206,7 @@ textarea::placeholder{ font-family:'EB Garamond', serif; font-style:italic; colo
 .output-empty{ color:#8a7d5f; font-style:italic; font-size:1rem; text-align:center; padding:18px 0; font-family:'EB Garamond', serif; }
 .glyph-line{
   font-family:'Cronicas', serif; font-size:2.1rem; line-height:1.7;
-  color:#241b0f; word-spacing:.5em; letter-spacing:.02em; text-align:right;
+  color:#241b0f; word-spacing:.5em; letter-spacing:.02em; direction:ltr; text-align:right;
   overflow-wrap:break-word; word-break:break-word; white-space:pre-wrap;
 }
 .plain-line{
@@ -359,7 +363,16 @@ function playInk(el){
   el.classList.add("ink-in");
 }
 
-function reverseText(text){ return text.split("").reverse().join(""); }
+function reverseText(text){
+  // Reverse the letters within each word, but keep word order and
+  // whitespace exactly as typed — so the first word you write stays
+  // first (and on top when the line wraps), and copying matches
+  // exactly what's shown on screen.
+  return text.split(/(\s+)/).map(chunk => {
+    if(/^\s+$/.test(chunk)) return chunk;
+    return chunk.split("").reverse().join("");
+  }).join("");
+}
 
 // ---- private-use-area glyph mapping ----
 // A-Z/a-z map to U+E000..U+E019, which the embedded Cronicas font also maps
@@ -386,6 +399,53 @@ function fromGlyphs(text){
   return out;
 }
 
+// ---- encode: line wrapping ----
+// The browser's own bidi engine (CSS direction:rtl) only reorders words
+// correctly when everything fits on one line. As soon as text wraps onto
+// multiple lines, the browser decides the wrapping in logical (typed)
+// order but then reorders words visually per paragraph, not per line —
+// so a word can jump to the wrong line entirely. To fix this properly we
+// compute the wrapping ourselves (measuring real rendered width) and then
+// reverse the word order *within each line we just built*, so line order
+// top-to-bottom always matches typing order, and each line reads right
+// to left. Letters inside each word are already reversed by reverseText.
+function buildGlyphMeasurer(){
+  const m = document.createElement("div");
+  m.className = "glyph-line";
+  m.style.position = "absolute";
+  m.style.visibility = "hidden";
+  m.style.whiteSpace = "nowrap";
+  m.style.left = "-99999px";
+  m.style.top = "-99999px";
+  m.style.direction = "ltr";
+  document.body.appendChild(m);
+  return m;
+}
+function wrapGlyphLinesForDisplay(glyphText, containerEl){
+  const maxWidth = containerEl.clientWidth;
+  const measurer = buildGlyphMeasurer();
+  const outLines = [];
+  const paragraphs = glyphText.split("\n");
+  for(const para of paragraphs){
+    const words = para.split(/\s+/).filter(Boolean);
+    if(words.length === 0){ outLines.push(""); continue; }
+    let current = [];
+    for(const word of words){
+      const candidate = current.length ? current.join(" ") + " " + word : word;
+      measurer.textContent = candidate;
+      if(current.length && maxWidth > 0 && measurer.getBoundingClientRect().width > maxWidth){
+        outLines.push(current.reverse().join(" "));
+        current = [word];
+      } else {
+        current.push(word);
+      }
+    }
+    outLines.push(current.reverse().join(" "));
+  }
+  document.body.removeChild(measurer);
+  return outLines.join("\n");
+}
+
 // ---- encode ----
 function renderEncode(){
   const text = document.getElementById("inputEncode").value.trim();
@@ -394,14 +454,37 @@ function renderEncode(){
     output.innerHTML = '<p class="output-empty">O texto traduzido aparece aqui.</p>';
     return;
   }
+  const glyphText = toGlyphs(reverseText(text));
   const line = document.createElement("div");
   line.className = "glyph-line";
-  line.textContent = toGlyphs(reverseText(text));
+  line.textContent = wrapGlyphLinesForDisplay(glyphText, output);
   output.innerHTML = "";
   output.appendChild(line);
   playInk(line);
 }
 document.getElementById("inputEncode").addEventListener("input", renderEncode);
+
+// Re-wrap whenever the output box's width actually changes (window resize,
+// the "chave do alfabeto" side/below toggle, mobile rotation) and once the
+// custom Cronicas font finishes loading (its glyphs may be wider/narrower
+// than the fallback font used for the very first measurement).
+let lastEncodeOutputWidth = null;
+function maybeRerenderEncode(){
+  const output = document.getElementById("outputEncode");
+  if(!output) return;
+  const w = output.clientWidth;
+  if(w !== lastEncodeOutputWidth){
+    lastEncodeOutputWidth = w;
+    renderEncode();
+  }
+}
+window.addEventListener("resize", maybeRerenderEncode);
+if(window.ResizeObserver){
+  new ResizeObserver(maybeRerenderEncode).observe(document.getElementById("outputEncode"));
+}
+if(document.fonts && document.fonts.ready){
+  document.fonts.ready.then(() => { lastEncodeOutputWidth = null; maybeRerenderEncode(); });
+}
 
 // ---- decode ----
 function renderDecode(){
@@ -466,21 +549,23 @@ async function textToImageBlob(glyphText){
   const mctx = measureCanvas.getContext("2d");
   mctx.font = `${fontSize}px Cronicas, serif`;
 
-  // wrap into lines that fit a reasonable max width
+  // wrap into lines that fit a reasonable max width, then reverse the
+  // word order within each line (same fix as the on-screen preview) so
+  // the exported image reads right-to-left the same way the site does
   const maxWidth = 900;
-  const words = glyphText.split(" ");
+  const words = glyphText.split(/\s+/).filter(Boolean);
   const lines = [];
-  let current = "";
+  let current = [];
   for(const word of words){
-    const test = current ? current + " " + word : word;
-    if(mctx.measureText(test).width > maxWidth && current){
-      lines.push(current);
-      current = word;
+    const candidate = current.length ? current.join(" ") + " " + word : word;
+    if(current.length && mctx.measureText(candidate).width > maxWidth){
+      lines.push(current.reverse().join(" "));
+      current = [word];
     } else {
-      current = test;
+      current.push(word);
     }
   }
-  if(current) lines.push(current);
+  if(current.length) lines.push(current.reverse().join(" "));
 
   let widest = 0;
   for(const l of lines) widest = Math.max(widest, mctx.measureText(l).width);
