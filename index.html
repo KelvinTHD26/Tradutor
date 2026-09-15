@@ -123,53 +123,30 @@ h1{
   margin:0 auto; max-width:46ch; line-height:1.55; text-align:center;
 }
 
-.switch{
-  display:flex; justify-content:center; gap:0; margin:34px auto 40px;
-  width:fit-content; border:1px solid var(--line); border-radius:3px; overflow:hidden;
+.tabs{
+  display:flex; flex-wrap:wrap; justify-content:center; gap:0;
+  margin:34px auto 30px; width:fit-content; max-width:100%;
+  border:1px solid var(--line); border-radius:3px; overflow:hidden;
 }
-.switch button{
-  font-family:'Cinzel', serif; font-size:.72rem; letter-spacing:.1em;
+.tab-btn{
+  font-family:'Cinzel', serif; font-size:.7rem; letter-spacing:.08em;
   background:var(--void-2); color:var(--teal-dim); border:none;
-  padding:13px 22px; cursor:pointer; transition:background .25s, color .25s, box-shadow .25s;
+  padding:13px 20px; cursor:pointer; transition:background .25s, color .25s, box-shadow .25s;
+  display:flex; align-items:center; gap:6px;
 }
-.switch button + button{ border-left:1px solid var(--line); }
-.switch button.active{ background:var(--void-3); color:var(--teal); box-shadow:inset 0 0 18px rgba(57,232,200,.15); }
-.switch button:hover:not(.active){ color:var(--ink); background:#0d1a17; box-shadow:inset 0 0 12px rgba(57,232,200,.08); }
-
-.layout-controls{
-  display:flex; justify-content:flex-end; align-items:center; gap:10px;
-  margin:0 0 14px;
-}
-.layout-controls span{
-  font-family:'Cinzel', serif; font-size:.64rem; letter-spacing:.1em; color:var(--teal-dim);
-}
-.layout-controls .pos-toggle{
-  display:flex; border:1px solid var(--line); border-radius:3px; overflow:hidden;
-}
-.layout-controls .pos-toggle button{
-  font-family:'Cinzel', serif; font-size:.64rem; letter-spacing:.08em;
-  background:var(--void-2); color:var(--teal-dim); border:none;
-  padding:8px 14px; cursor:pointer; transition:background .2s,color .2s;
-}
-.layout-controls .pos-toggle button + button{ border-left:1px solid var(--line); }
-.layout-controls .pos-toggle button.active{ background:var(--void-3); color:var(--teal); }
-
-.layout{
-  display:grid; grid-template-columns:1fr; gap:30px; margin-top:0; align-items:start;
-}
-.layout.pos-side{ grid-template-columns:1fr 250px; }
-.layout.pos-below{ grid-template-columns:1fr; }
-@media (max-width:720px){
-  .layout.pos-side{ grid-template-columns:1fr; }
+.tab-btn + .tab-btn{ border-left:1px solid var(--line); }
+.tab-btn.active{ background:var(--void-3); color:var(--teal); box-shadow:inset 0 0 18px rgba(57,232,200,.15); }
+.tab-btn:hover:not(.active){ color:var(--ink); background:#0d1a17; box-shadow:inset 0 0 12px rgba(57,232,200,.08); }
+@media (max-width:520px){
+  .tab-btn{ padding:11px 14px; font-size:.62rem; flex:1 1 40%; justify-content:center; }
+  .tab-btn + .tab-btn{ border-left:1px solid var(--line); }
 }
 
 .card{
   background:linear-gradient(180deg, #0c1613, #080f0d);
   border:1px solid var(--line); border-radius:2px; padding:34px; position:relative;
-  min-width:0; /* grid items default to min-width:auto, which lets an
-    unbreakable string (e.g. no spaces) force this track wider than its
-    1fr share instead of wrapping — this line lets it shrink to fit so
-    overflow-wrap can actually do its job and the sidebar column stays put */
+  min-width:0;
+  perspective:800px;
   box-shadow:0 20px 50px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.02);
   transition:box-shadow .3s ease;
 }
@@ -195,7 +172,12 @@ h1{
 .corner-ornaments .br::after{ bottom:-2px; right:-2px; }
 
 .panel{ display:none; }
-.panel.active{ display:block; }
+.panel.active{ display:block; animation:panelUnroll .38s ease; transform-origin:top center; }
+@keyframes panelUnroll{
+  from{ opacity:0; transform:scaleY(.96) rotateX(8deg) translateY(-6px); }
+  to{ opacity:1; transform:scaleY(1) rotateX(0) translateY(0); }
+}
+@media (prefers-reduced-motion:reduce){ .panel.active{ animation:none; } }
 
 label{
   display:block; font-family:'Cinzel', serif; font-size:.72rem;
@@ -205,6 +187,7 @@ textarea{
   width:100%; min-height:90px; background:var(--void-2); border:1px solid var(--line);
   color:var(--ink); font-family:'EB Garamond', serif; font-size:1.15rem;
   padding:14px 16px; resize:vertical; border-radius:1px; line-height:1.5;
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='30' height='42' viewBox='0 0 30 42'><defs><linearGradient id='g' x1='0' y1='0' x2='0.3' y2='1'><stop offset='0' stop-color='%23f3e9d2'/><stop offset='1' stop-color='%23c2ac84'/></linearGradient></defs><path d='M26 2 C20 1 12 4 8 11 C3 17 1 25 2 33 C2 36 3 38 4 40 C6 36 10 29 14 22 C19 14 23 8 26 2 Z' fill='url(%23g)' stroke='%233a2c1a' stroke-width='1'/><path d='M26 2 C18 12 9 26 4 40' fill='none' stroke='%233a2c1a' stroke-width='0.9'/><g stroke='%235c4a30' stroke-width='0.6' opacity='0.55'><line x1='23' y1='6' x2='17' y2='4'/><line x1='23' y1='6' x2='25' y2='10'/><line x1='19.5' y1='12' x2='13' y2='10'/><line x1='19.5' y1='12' x2='21.5' y2='16'/><line x1='16' y1='18' x2='9.5' y2='17'/><line x1='16' y1='18' x2='18' y2='22'/><line x1='12' y1='24' x2='6.5' y2='24'/><line x1='12' y1='24' x2='14' y2='28'/><line x1='8' y1='30' x2='4.5' y2='31'/><line x1='8' y1='30' x2='10' y2='33'/></g><circle cx='4' cy='40' r='2.2' fill='%23161010'/></svg>") 4 40, text;
 }
 textarea.cipher-input{
   font-family:'Cronicas', serif; font-size:1.5rem; letter-spacing:.03em;
@@ -265,14 +248,44 @@ textarea::placeholder{ font-family:'EB Garamond', serif; font-style:italic; colo
   );
   clip-path: var(--tear);
   background:
-    radial-gradient(ellipse 60% 40% at 20% 15%, rgba(120,100,60,.12) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 35% at 85% 80%, rgba(90,75,45,.14) 0%, transparent 55%),
+    var(--age-stains, none),
+    radial-gradient(ellipse 60% 40% at var(--warm1-pos, 20% 15%), rgba(120,100,60,.12) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 35% at var(--warm2-pos, 85% 80%), rgba(90,75,45,.14) 0%, transparent 55%),
     repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(0,0,0,.09) 28px),
     linear-gradient(135deg, var(--parchment), var(--parchment-2));
   padding:38px 30px; min-height:120px;
   box-shadow:inset 0 0 40px rgba(30,20,5,.35), 0 8px 24px rgba(0,0,0,.4);
   position:relative;
   overflow-wrap:break-word; word-break:break-word;
+}
+/* Age variants: each translation gets one at random, so the parchment
+   never looks quite the same twice — different tear line, stains, tint. */
+.output-wrap.age-2{
+  --tear: polygon(
+    0% 1%, 4% 0%, 11% 2%, 18% 0.3%, 25% 1.8%, 33% 0%, 40% 1.2%, 48% 0%, 56% 1.7%,
+    64% 0.4%, 72% 1.5%, 80% 0%, 88% 1.1%, 95% 0.3%, 100% 1.8%,
+    100% 97%, 94% 100%, 87% 98.2%, 80% 100%, 71% 98.6%, 63% 100%, 55% 98%,
+    47% 100%, 39% 98.4%, 31% 100%, 23% 98.6%, 15% 100%, 8% 98.2%, 2% 100%, 0% 98.6%
+  );
+  --warm1-pos: 75% 20%; --warm2-pos: 15% 85%;
+  --age-stains: radial-gradient(circle 90px at 82% 18%, rgba(80,55,20,.16), transparent 70%);
+}
+.output-wrap.age-3{
+  --tear: polygon(
+    0% 3%, 5% 0%, 13% 1.8%, 20% 0%, 27% 1.4%, 35% 0.2%, 43% 1.6%, 51% 0%, 59% 1.3%,
+    67% 0%, 75% 1.7%, 83% 0.3%, 91% 1.5%, 100% 0%,
+    100% 99%, 92% 100%, 85% 98.5%, 77% 100%, 69% 98.2%, 61% 100%, 53% 98.6%,
+    45% 100%, 37% 98.3%, 29% 100%, 21% 98.5%, 13% 100%, 5% 98.2%, 0% 100%
+  );
+  --warm1-pos: 12% 80%; --warm2-pos: 90% 12%;
+  --age-stains:
+    radial-gradient(circle 70px at 10% 85%, rgba(60,40,15,.2), transparent 70%),
+    radial-gradient(circle 40px at 92% 30%, rgba(60,40,15,.14), transparent 70%);
+}
+.output-wrap.age-4{
+  --warm1-pos: 50% 8%; --warm2-pos: 50% 92%;
+  --age-stains: radial-gradient(ellipse 120px 50px at 55% 55%, rgba(70,90,80,.1), transparent 70%);
+  filter: sepia(.12) contrast(1.02);
 }
 .output-wrap::after{
   content:"";
@@ -354,24 +367,22 @@ textarea::placeholder{ font-family:'EB Garamond', serif; font-style:italic; colo
 
 .reading-note{ text-align:center; font-size:.76rem; letter-spacing:.06em; color:var(--teal-dim); margin-top:12px; font-style:italic; }
 
-/* ---- key chart: sidebar on desktop, accordion on mobile ---- */
-.keypanel{
-  background:linear-gradient(180deg, #0c1613, #080f0d);
-  border:1px solid var(--line); border-radius:2px; padding:22px 18px; position:relative;
+/* ---- key chart: collapsible, inline within encode/decode panels ---- */
+.inline-key{ margin-top:20px; }
+.inline-key summary{
+  cursor:pointer; list-style:none; user-select:none;
+  display:flex; align-items:center; gap:8px;
+  font-family:'Cinzel', serif; font-size:.68rem; letter-spacing:.1em;
+  color:var(--teal-dim); transition:color .2s;
 }
-.keypanel::before{ content:""; position:absolute; inset:8px; border:1px solid var(--line-soft); pointer-events:none; }
-.keypanel summary{
-  cursor:pointer; font-family:'Cinzel', serif; font-size:.72rem; letter-spacing:.12em;
-  color:var(--teal-dim); list-style:none; display:flex; align-items:center; gap:8px;
-  user-select:none;
-}
-.keypanel summary::-webkit-details-marker{ display:none; }
-.keypanel summary::before{ content:"+"; display:inline-block; width:14px; color:var(--teal); font-size:1rem; }
-.keypanel[open] summary::before{ content:"–"; }
+.inline-key summary:hover{ color:var(--ink); }
+.inline-key summary::-webkit-details-marker{ display:none; }
+.inline-key summary::before{ content:"+"; display:inline-block; width:12px; color:var(--teal); font-size:1rem; }
+.inline-key[open] summary::before{ content:"–"; }
 .keygrid{
   display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; margin-top:16px;
 }
-@media (min-width:920px){ .keygrid{ grid-template-columns:repeat(3, 1fr); } }
+@media (min-width:600px){ .keygrid{ grid-template-columns:repeat(6, 1fr); } }
 .keycell{
   display:flex; flex-direction:column; align-items:center; gap:5px;
   background:var(--void-2); border:1px solid var(--line-soft); border-radius:2px; padding:9px 3px;
@@ -385,10 +396,8 @@ textarea::placeholder{ font-family:'EB Garamond', serif; font-style:italic; colo
 .keycell:hover .sym{ text-shadow:0 0 10px rgba(57,232,200,.6); }
 .keycell .norm{ font-family:'Cinzel', serif; font-size:.62rem; letter-spacing:.05em; color:var(--teal-dim); }
 
-.sidebar-stack{ display:flex; flex-direction:column; gap:20px; min-width:0; }
-
 .history-count{
-  margin-left:auto; font-family:'Cinzel', serif; font-size:.62rem; color:var(--teal-dim); opacity:.8;
+  margin-left:2px; font-family:'Cinzel', serif; font-size:.6rem; color:var(--teal-dim); opacity:.75;
 }
 .history-list{ margin-top:16px; display:flex; flex-direction:column; gap:8px; max-height:280px; overflow-y:auto; }
 .history-empty{ font-family:'EB Garamond', serif; font-style:italic; color:var(--teal-dim); font-size:.85rem; opacity:.75; margin:0; }
@@ -427,7 +436,7 @@ textarea::placeholder{ font-family:'EB Garamond', serif; font-style:italic; colo
 footer{ text-align:center; margin-top:28px; color:var(--teal-dim); font-size:.83rem; font-style:italic; opacity:.8; }
 footer .foot-mark{ display:inline-block; margin:0 10px; opacity:.6; transform:translateY(-1px); }
 
-@media (max-width:480px){ .card{padding:22px 18px;} h1{font-size:1.7rem;} .switch button{padding:12px 16px;font-size:.66rem;} .output-wrap{padding:30px 20px;} }
+@media (max-width:480px){ .card{padding:22px 18px;} h1{font-size:1.7rem;} .output-wrap{padding:30px 20px;} }
 </style>
 </head>
 <body>
@@ -467,100 +476,90 @@ footer .foot-mark{ display:inline-block; margin:0 10px; opacity:.6; transform:tr
     <p class="sub">Ferramenta de tradução para o alfabeto de Crônicas do Vazio Atômico. Útil pra escrever pistas, bilhetes e anotações de sessão.</p>
   </header>
 
-  <div class="switch">
-    <button id="btnEncode" class="active">Texto → Símbolos</button>
-    <button id="btnDecode">Símbolos → Texto</button>
+  <div class="tabs" id="tabs">
+    <button type="button" id="btnEncode" class="tab-btn active">Codificar</button>
+    <button type="button" id="btnDecode" class="tab-btn">Decodificar</button>
+    <button type="button" id="btnHistory" class="tab-btn">Histórico<span class="history-count" id="historyCount"></span></button>
   </div>
 
-  <div class="layout-controls">
-    <span>Chave do alfabeto</span>
-    <div class="pos-toggle">
-      <button type="button" id="posSide" class="active">Do lado</button>
-      <button type="button" id="posBelow">Embaixo</button>
+  <div class="card">
+    <div class="corner-ornaments" aria-hidden="true">
+      <span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span>
     </div>
-  </div>
 
-  <div class="layout pos-side" id="layout">
-    <div class="card">
-      <div class="corner-ornaments" aria-hidden="true">
-        <span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span>
-      </div>
+    <!-- ENCODE PANEL -->
+    <div class="panel active" id="panelEncode">
+      <label for="inputEncode">Texto comum</label>
+      <textarea id="inputEncode" placeholder="Escreva aqui..." autofocus></textarea>
 
-      <!-- ENCODE PANEL -->
-      <div class="panel active" id="panelEncode">
-        <label for="inputEncode">Texto comum</label>
-        <textarea id="inputEncode" placeholder="Escreva aqui..." autofocus></textarea>
+      <div class="divider"><svg viewBox="0 0 24 24"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" stroke="none"/></svg></div>
 
-        <div class="divider"><svg viewBox="0 0 24 24"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" stroke="none"/></svg></div>
-
-        <label>Em símbolos</label>
-        <div class="output-outer">
-          <div class="output-wrap">
-            <div class="copy-btn-group">
-              <button class="copy-btn" id="copyEncodeImg">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="15" rx="1.5"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 15l-5.5-5-6 6"/></svg>
-                <span>Imagem</span>
-              </button>
-            </div>
-            <div id="outputEncode"><p class="output-empty">O texto traduzido aparece aqui.</p></div>
-            <div class="wax-seal" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M12 3 L14 9 L20 10 L14 13 L12 20 L10 13 L4 10 L10 9 Z"/></svg>
-            </div>
+      <label>Em símbolos</label>
+      <div class="output-outer">
+        <div class="output-wrap">
+          <div class="copy-btn-group">
+            <button class="copy-btn" id="copyEncodeImg">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="15" rx="1.5"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 15l-5.5-5-6 6"/></svg>
+              <span>Imagem</span>
+            </button>
           </div>
-        </div>
-        <p class="reading-note">← sentido de leitura</p>
-      </div>
-
-      <!-- DECODE PANEL -->
-      <div class="panel" id="panelDecode">
-        <label for="inputDecode">Símbolos (digite usando o alfabeto normal — veja a chave)</label>
-        <div class="cipher-input-wrap">
-          <textarea id="inputDecode" class="cipher-input" placeholder="ex: nivlek"></textarea>
-          <div class="cipher-mirror" id="cipherMirror" aria-hidden="true"></div>
-        </div>
-        <button type="button" id="btnInvert" class="invert-btn">
-          <svg viewBox="0 0 24 24" width="15" height="15"><path d="M7 7h11M18 7l-3-3M18 7l-3 3M17 17H6M6 17l3-3M6 17l3 3" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Inverter ordem digitada
-        </button>
-
-        <div class="divider"><svg viewBox="0 0 24 24"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" stroke="none"/></svg></div>
-
-        <label>Texto comum</label>
-        <div class="output-outer">
-          <div class="output-wrap">
-            <div class="copy-btn-group">
-              <button class="copy-btn" id="copyDecode">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="8" y="8" width="12" height="12" rx="1"/><path d="M5 16H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v1"/></svg>
-                <span>Copiar</span>
-              </button>
-            </div>
-            <div id="outputDecode"><p class="output-empty">O texto decifrado aparece aqui.</p></div>
+          <div id="outputEncode"><p class="output-empty">O texto traduzido aparece aqui.</p></div>
+          <div class="wax-seal" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 3 L14 9 L20 10 L14 13 L12 20 L10 13 L4 10 L10 9 Z"/></svg>
           </div>
         </div>
       </div>
+      <p class="reading-note">← sentido de leitura</p>
 
-    </div>
-
-    <div class="sidebar-stack">
-      <details class="keypanel" id="keyPanel">
-        <div class="corner-ornaments" aria-hidden="true">
-          <span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span>
-        </div>
-        <summary>Chave do alfabeto</summary>
-        <div class="keygrid" id="keyGrid"></div>
-      </details>
-
-      <details class="keypanel history-panel" id="historyPanel">
-        <div class="corner-ornaments" aria-hidden="true">
-          <span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span>
-        </div>
-        <summary>Histórico <span class="history-count" id="historyCount"></span></summary>
-        <div class="history-list" id="historyList">
-          <p class="history-empty">Suas últimas traduções aparecem aqui.</p>
-        </div>
-        <button type="button" class="history-clear" id="historyClear">Limpar histórico</button>
+      <details class="inline-key">
+        <summary>Ver chave do alfabeto</summary>
+        <div class="keygrid" id="keyGridEncode"></div>
       </details>
     </div>
+
+    <!-- DECODE PANEL -->
+    <div class="panel" id="panelDecode">
+      <label for="inputDecode">Símbolos (digite usando o alfabeto normal)</label>
+
+      <details class="inline-key">
+        <summary>Ver chave do alfabeto</summary>
+        <div class="keygrid" id="keyGridDecode"></div>
+      </details>
+
+      <div class="cipher-input-wrap">
+        <textarea id="inputDecode" class="cipher-input" placeholder="ex: nivlek"></textarea>
+        <div class="cipher-mirror" id="cipherMirror" aria-hidden="true"></div>
+      </div>
+      <button type="button" id="btnInvert" class="invert-btn">
+        <svg viewBox="0 0 24 24" width="15" height="15"><path d="M7 7h11M18 7l-3-3M18 7l-3 3M17 17H6M6 17l3-3M6 17l3 3" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Inverter ordem digitada
+      </button>
+
+      <div class="divider"><svg viewBox="0 0 24 24"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" stroke="none"/></svg></div>
+
+      <label>Texto comum</label>
+      <div class="output-outer">
+        <div class="output-wrap">
+          <div class="copy-btn-group">
+            <button class="copy-btn" id="copyDecode">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="8" y="8" width="12" height="12" rx="1"/><path d="M5 16H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v1"/></svg>
+              <span>Copiar</span>
+            </button>
+          </div>
+          <div id="outputDecode"><p class="output-empty">O texto decifrado aparece aqui.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORY PANEL -->
+    <div class="panel" id="panelHistory">
+      <label>Histórico de traduções</label>
+      <div class="history-list" id="historyList">
+        <p class="history-empty">Suas últimas traduções aparecem aqui.</p>
+      </div>
+      <button type="button" class="history-clear" id="historyClear">Limpar histórico</button>
+    </div>
+
   </div>
 
   <footer><span class="foot-mark" aria-hidden="true">✦</span>cada palavra se dobra sobre si mesma · lida do fim para o início<span class="foot-mark" aria-hidden="true">✦</span></footer>
@@ -570,20 +569,27 @@ footer .foot-mark{ display:inline-block; margin:0 10px; opacity:.6; transform:tr
 <script>
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-// ---- mode switching ----
+// ---- tab switching (Codificar / Decodificar / Histórico) ----
 const btnEncode = document.getElementById("btnEncode");
 const btnDecode = document.getElementById("btnDecode");
+const btnHistory = document.getElementById("btnHistory");
 const panelEncode = document.getElementById("panelEncode");
 const panelDecode = document.getElementById("panelDecode");
+const panelHistory = document.getElementById("panelHistory");
 
-btnEncode.addEventListener("click", () => {
-  btnEncode.classList.add("active"); btnDecode.classList.remove("active");
-  panelEncode.classList.add("active"); panelDecode.classList.remove("active");
-});
-btnDecode.addEventListener("click", () => {
-  btnDecode.classList.add("active"); btnEncode.classList.remove("active");
-  panelDecode.classList.add("active"); panelEncode.classList.remove("active");
-});
+const TAB_PAIRS = [
+  [btnEncode, panelEncode],
+  [btnDecode, panelDecode],
+  [btnHistory, panelHistory],
+];
+function activateTab(btn){
+  TAB_PAIRS.forEach(([b, p]) => {
+    const active = b === btn;
+    b.classList.toggle("active", active);
+    p.classList.toggle("active", active);
+  });
+}
+TAB_PAIRS.forEach(([b]) => b.addEventListener("click", () => activateTab(b)));
 
 function playInk(el){
   el.classList.remove("ink-in");
@@ -688,13 +694,29 @@ function wrapGlyphLinesForDisplay(glyphText, containerEl){
 }
 
 // ---- encode ----
+// Each fresh translation gets a slightly different parchment "age" —
+// different tear line, stains, tint — so it never looks quite the same twice.
+const PARCHMENT_AGE_CLASSES = ["age-2", "age-3", "age-4"];
+function rollParchmentAge(wrapEl){
+  if(!wrapEl) return;
+  wrapEl.classList.remove(...PARCHMENT_AGE_CLASSES);
+  if(Math.random() < 0.7){
+    wrapEl.classList.add(PARCHMENT_AGE_CLASSES[Math.floor(Math.random()*PARCHMENT_AGE_CLASSES.length)]);
+  }
+}
+let encodeWasEmpty = true;
+let decodeWasEmpty = true;
+
 function renderEncode(){
   const text = document.getElementById("inputEncode").value.trim();
   const output = document.getElementById("outputEncode");
   if(!text){
     output.innerHTML = '<p class="output-empty">O texto traduzido aparece aqui.</p>';
+    encodeWasEmpty = true;
     return;
   }
+  if(encodeWasEmpty) rollParchmentAge(output.closest(".output-wrap"));
+  encodeWasEmpty = false;
   const glyphText = toGlyphs(reverseText(text));
   const line = document.createElement("div");
   line.className = "glyph-line";
@@ -743,8 +765,11 @@ function renderDecode(){
   const output = document.getElementById("outputDecode");
   if(!text){
     output.innerHTML = '<p class="output-empty">O texto decifrado aparece aqui.</p>';
+    decodeWasEmpty = true;
     return;
   }
+  if(decodeWasEmpty) rollParchmentAge(output.closest(".output-wrap"));
+  decodeWasEmpty = false;
   const line = document.createElement("div");
   line.className = "plain-line";
   const decoded = fromGlyphs(text);
@@ -1021,11 +1046,13 @@ document.getElementById("copyEncodeImg").addEventListener("click", (e) => {
   copyImageOrDownload(toGlyphs(reverseText(text)), e.currentTarget);
 });
 
-// ---- key chart ----
+// ---- key chart (shown inline in both encode and decode panels) ----
 const KEY_CHARS = ALPHABET.split("");
-document.getElementById("keyGrid").innerHTML = KEY_CHARS.map(ch => `
+const keyGridHTML = KEY_CHARS.map(ch => `
   <div class="keycell"><span class="sym">${toGlyphs(ch)}</span><span class="norm">${ch.toUpperCase()}</span></div>
 `).join("");
+document.getElementById("keyGridEncode").innerHTML = keyGridHTML;
+document.getElementById("keyGridDecode").innerHTML = keyGridHTML;
 
 // ---- history ----
 const HISTORY_KEY = "cronicas_history_v1";
@@ -1107,23 +1134,6 @@ document.getElementById("historyClear").addEventListener("click", () => {
   renderHistory();
 });
 renderHistory();
-
-// ---- key chart position toggle ----
-const layoutEl = document.getElementById("layout");
-const keyPanel = document.getElementById("keyPanel");
-const posSideBtn = document.getElementById("posSide");
-const posBelowBtn = document.getElementById("posBelow");
-
-function setLayoutPos(pos){
-  layoutEl.classList.remove("pos-side","pos-below");
-  layoutEl.classList.add(pos);
-  posSideBtn.classList.toggle("active", pos === "pos-side");
-  posBelowBtn.classList.toggle("active", pos === "pos-below");
-  if(pos === "pos-side"){ keyPanel.setAttribute("open",""); }
-}
-posSideBtn.addEventListener("click", () => setLayoutPos("pos-side"));
-posBelowBtn.addEventListener("click", () => setLayoutPos("pos-below"));
-setLayoutPos("pos-side");
 
 // ---- particles ----
 const particleField = document.getElementById("particles");
