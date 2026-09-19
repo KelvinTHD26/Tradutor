@@ -3,10 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Crônicas do Vazio Atômico</title>
+<title>Crônicas do Vazio Atômico — Tradutor</title>
+<meta name="description" content="Ferramenta de tradução para o alfabeto de Crônicas do Vazio Atômico: escreva pistas, bilhetes e anotações de sessão no idioma do seu RPG.">
+<meta name="theme-color" content="#050807">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23050807'/%3E%3Ccircle cx='50' cy='50' r='40' fill='none' stroke='%2339e8c8' stroke-width='3' opacity='0.6'/%3E%3Cpath d='M50 30 L54 46 L70 50 L54 54 L50 70 L46 54 L30 50 L46 46 Z' fill='%2339e8c8'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23081310'/%3E%3Ccircle cx='50' cy='50' r='42' fill='none' stroke='%2339e8c8' stroke-width='3'/%3E%3Cpath d='M50 28 L55 45 L72 50 L55 55 L50 72 L45 55 L28 50 L45 45 Z' fill='%2339e8c8'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
 <style>
+/* If the Google Fonts request fails or is blocked (offline, ad-blockers,
+   restricted networks), everything still reads fine — Cinzel/EB Garamond
+   are only ever referenced alongside a generic 'serif' fallback below,
+   and the hand-embedded Cronicas font never depends on the network at all. */
 @font-face{
   font-family: 'Cronicas';
   src: url(data:font/ttf;base64,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) format('truetype');
@@ -28,6 +38,7 @@
 }
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
+html{ -webkit-text-size-adjust:100%; text-size-adjust:100%; }
 body{
   background:
     radial-gradient(ellipse 70% 45% at 50% -6%, #0e2620 0%, transparent 55%),
@@ -38,6 +49,49 @@ body{
   color:var(--ink);
   position:relative;
   overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  -webkit-tap-highlight-color:transparent;
+}
+
+::selection{ background:rgba(57,232,200,.32); color:#eafffa; }
+
+/* Keyboard focus gets a clear, on-theme ring; mouse/touch clicks don't
+   show it, so it never fights with the custom hover states above. */
+:focus-visible{
+  outline:2px solid var(--teal);
+  outline-offset:2px;
+  border-radius:1px;
+}
+textarea:focus-visible{ outline-offset:0; }
+
+.skip-link{
+  position:absolute; left:12px; top:-48px; z-index:100;
+  background:var(--void-3); color:var(--teal); border:1px solid var(--teal-dim);
+  padding:10px 16px; border-radius:2px; font-family:'Cinzel', serif; font-size:.75rem;
+  letter-spacing:.06em; text-decoration:none; transition:top .2s;
+}
+.skip-link:focus{ top:12px; }
+
+/* ---- print: just the parchment result, ready to cut out at the table ---- */
+@media print{
+  body::before, .grain-overlay, .particles, .crest, .eyebrow, .header-flourish,
+  .tabs, .sub, footer, .inline-key, .invert-btn, .copy-btn-group, .skip-link,
+  .output-tools, .textbox-clear, .char-count,
+  #cipherMirror, textarea{
+    display:none !important;
+  }
+  body{ background:#fff !important; }
+  .page{ max-width:100%; }
+  .card{ background:none; border:none; box-shadow:none; padding:0; perspective:none; }
+  .card::before{ display:none; }
+  .corner-ornaments{ display:none; }
+  .panel{ animation:none !important; }
+  .panel.active{ display:block !important; margin-bottom:24px; }
+  h1{ color:#000; text-shadow:none; text-align:center; }
+  label{ color:#333; }
+  .output-wrap{ box-shadow:none; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .reading-note{ color:#555; }
 }
 
 /* ---- full-page grain overlay ---- */
@@ -186,7 +240,7 @@ label{
 textarea{
   width:100%; min-height:90px; background:var(--void-2); border:1px solid var(--line);
   color:var(--ink); font-family:'EB Garamond', serif; font-size:1.15rem;
-  padding:14px 16px; resize:vertical; border-radius:1px; line-height:1.5;
+  padding:14px 16px; resize:none; border-radius:1px; line-height:1.5; overflow-y:hidden;
   cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='30' height='42' viewBox='0 0 30 42'><defs><linearGradient id='g' x1='0' y1='0' x2='0.3' y2='1'><stop offset='0' stop-color='%23f3e9d2'/><stop offset='1' stop-color='%23c2ac84'/></linearGradient></defs><path d='M26 2 C20 1 12 4 8 11 C3 17 1 25 2 33 C2 36 3 38 4 40 C6 36 10 29 14 22 C19 14 23 8 26 2 Z' fill='url(%23g)' stroke='%233a2c1a' stroke-width='1'/><path d='M26 2 C18 12 9 26 4 40' fill='none' stroke='%233a2c1a' stroke-width='0.9'/><g stroke='%235c4a30' stroke-width='0.6' opacity='0.55'><line x1='23' y1='6' x2='17' y2='4'/><line x1='23' y1='6' x2='25' y2='10'/><line x1='19.5' y1='12' x2='13' y2='10'/><line x1='19.5' y1='12' x2='21.5' y2='16'/><line x1='16' y1='18' x2='9.5' y2='17'/><line x1='16' y1='18' x2='18' y2='22'/><line x1='12' y1='24' x2='6.5' y2='24'/><line x1='12' y1='24' x2='14' y2='28'/><line x1='8' y1='30' x2='4.5' y2='31'/><line x1='8' y1='30' x2='10' y2='33'/></g><circle cx='4' cy='40' r='2.2' fill='%23161010'/></svg>") 4 40, text;
 }
 textarea.cipher-input{
@@ -219,8 +273,30 @@ textarea.cipher-input{
   background:var(--teal); vertical-align:middle; animation:caretBlink 1s step-end infinite;
 }
 @keyframes caretBlink{ 50%{ opacity:0; } }
+@media (prefers-reduced-motion:reduce){ .fake-caret{ animation:none; } }
 textarea:focus{ outline:none; border-color:var(--teal); }
 textarea::placeholder{ font-family:'EB Garamond', serif; font-style:italic; color:#3f5851; font-size:1rem; }
+
+.textarea-wrap{ position:relative; }
+.textbox-clear{
+  position:absolute; top:8px; right:8px; z-index:3;
+  width:22px; height:22px; border-radius:50%; border:1px solid var(--line);
+  background:var(--void-3); color:var(--teal-dim); cursor:pointer;
+  font-size:1rem; line-height:1; display:flex; align-items:center; justify-content:center;
+  opacity:0; visibility:hidden; pointer-events:none;
+  transition:opacity .2s, color .2s, border-color .2s, visibility .2s;
+}
+.textarea-wrap:focus-within .textbox-clear,
+.cipher-input-wrap:focus-within .textbox-clear,
+.textbox-clear.show{ opacity:1; visibility:visible; pointer-events:auto; }
+.textbox-clear:hover{ color:#c96a6a; border-color:#c96a6a; }
+.char-count{
+  position:absolute; bottom:6px; right:10px; z-index:3; pointer-events:none;
+  font-family:'Cinzel', serif; font-size:.6rem; letter-spacing:.05em; color:var(--teal-dim); opacity:.55;
+}
+.cipher-input-wrap .textbox-clear{ top:8px; right:8px; }
+.cipher-input-wrap .char-count{ bottom:6px; right:10px; }
+.char-count.near-limit{ color:#c9a15a; opacity:.9; }
 
 .invert-btn{
   display:inline-flex; align-items:center; gap:8px;
@@ -342,17 +418,40 @@ textarea::placeholder{ font-family:'EB Garamond', serif; font-style:italic; colo
 .copy-btn:active{ transform:scale(.96); }
 .copy-btn svg{ width:12px; height:12px; flex:none; }
 .copy-btn.copied{ color:#2a5a44; border-color:#2a5a44; box-shadow:0 0 10px rgba(42,90,68,.35); }
+.copy-btn.copy-error{ color:#8a3a3a; border-color:#8a3a3a; }
+
+/* On narrow phones, two side-by-side buttons with full labels in that
+   absolutely-positioned top-right corner get cramped against the parchment's
+   edge — stack them instead so each keeps its label (needed for the
+   "Copiado!"/"Baixado!" feedback text) without hiding anything. */
+@media (max-width:480px){
+  .copy-btn-group{ top:10px; right:10px; flex-direction:column; align-items:flex-end; gap:5px; }
+  .copy-btn{ padding:6px 9px; font-size:.58rem; }
+  .output-wrap{ padding-top:58px; }
+}
+
+/* On narrow phones, two buttons with full labels in that absolutely-
+   positioned top-right corner get cramped against the parchment's edge
+   and can crowd the text below — shrink to icon-only there instead. */
+@media (max-width:480px){
+  .copy-btn-group{ top:10px; right:10px; gap:5px; }
+  .copy-btn{ padding:7px 8px; }
+  .copy-btn span{ display:none; }
+  .output-wrap{ padding-top:46px; }
+}
 
 .output-empty{ color:#8a7d5f; font-style:italic; font-size:1rem; text-align:center; padding:18px 0; font-family:'EB Garamond', serif; }
 .glyph-line{
   font-family:'Cronicas', serif; font-size:2.1rem; line-height:1.7;
   color:#241b0f; word-spacing:.5em; letter-spacing:.02em; direction:ltr; text-align:right;
   overflow-wrap:break-word; word-break:break-word; white-space:pre-wrap;
+  transition:font-size .2s ease;
 }
 .plain-line{
   font-family:'EB Garamond', serif; font-size:1.4rem; font-style:italic;
   color:#2c2313; line-height:1.6;
   overflow-wrap:break-word; word-break:break-word; white-space:pre-wrap;
+  transition:font-size .2s ease;
 }
 .ink-in{ animation:inkFade .5s ease; }
 @keyframes inkFade{ from{ opacity:0; filter:blur(2px); } to{ opacity:1; filter:blur(0); } }
@@ -366,6 +465,33 @@ textarea::placeholder{ font-family:'EB Garamond', serif; font-style:italic; colo
 @media (prefers-reduced-motion:reduce){ .ink-char{ animation:none; opacity:1; } }
 
 .reading-note{ text-align:center; font-size:.76rem; letter-spacing:.06em; color:var(--teal-dim); margin-top:12px; font-style:italic; }
+
+/* ---- output tools: presentation (fullscreen) mode ---- */
+.output-tools{ display:flex; justify-content:flex-end; align-items:center; margin-top:10px; gap:10px; }
+.present-btn{
+  background:var(--void-2); border:1px solid var(--line); color:var(--teal-dim);
+  border-radius:2px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:color .2s, border-color .2s;
+  padding:6px 8px;
+}
+.present-btn:hover{ color:var(--ink); border-color:var(--teal-dim); }
+.present-btn svg{ width:14px; height:14px; }
+.present-btn .icon-collapse{ display:none; }
+.present-btn.is-active .icon-expand{ display:none; }
+.present-btn.is-active .icon-collapse{ display:block; }
+.output-outer:fullscreen{
+  display:flex; align-items:center; justify-content:center;
+  background:var(--void); padding:40px;
+}
+.output-outer:-webkit-full-screen{ display:flex; align-items:center; justify-content:center; background:var(--void); padding:40px; }
+.output-outer:fullscreen .output-wrap,
+.output-outer:-webkit-full-screen .output-wrap{ max-width:min(1100px, 92vw); width:100%; }
+.output-outer:fullscreen .glyph-line{ font-size:min(9vw, 5.5rem) !important; }
+.output-outer:fullscreen .plain-line{ font-size:min(6.5vw, 4rem) !important; }
+.output-outer.presenting{ position:fixed; inset:0; z-index:90; display:flex; align-items:center; justify-content:center; background:var(--void); padding:40px; }
+.output-outer.presenting .output-wrap{ max-width:min(1100px, 92vw); width:100%; }
+.output-outer.presenting .glyph-line{ font-size:min(9vw, 5.5rem) !important; }
+.output-outer.presenting .plain-line{ font-size:min(6.5vw, 4rem) !important; }
 
 /* ---- key chart: collapsible, inline within encode/decode panels ---- */
 .inline-key{ margin-top:20px; }
@@ -440,6 +566,7 @@ footer .foot-mark{ display:inline-block; margin:0 10px; opacity:.6; transform:tr
 </style>
 </head>
 <body>
+<a class="skip-link" href="#tabs">Pular para o tradutor</a>
 <div class="grain-overlay" aria-hidden="true"></div>
 <div class="particles" id="particles"></div>
 
@@ -476,10 +603,10 @@ footer .foot-mark{ display:inline-block; margin:0 10px; opacity:.6; transform:tr
     <p class="sub">Ferramenta de tradução para o alfabeto de Crônicas do Vazio Atômico. Útil pra escrever pistas, bilhetes e anotações de sessão.</p>
   </header>
 
-  <div class="tabs" id="tabs">
-    <button type="button" id="btnEncode" class="tab-btn active">Codificar</button>
-    <button type="button" id="btnDecode" class="tab-btn">Decodificar</button>
-    <button type="button" id="btnHistory" class="tab-btn">Histórico<span class="history-count" id="historyCount"></span></button>
+  <div class="tabs" id="tabs" role="tablist" aria-label="Modo do tradutor">
+    <button type="button" id="btnEncode" class="tab-btn active" role="tab" aria-selected="true" aria-controls="panelEncode">Codificar</button>
+    <button type="button" id="btnDecode" class="tab-btn" role="tab" aria-selected="false" aria-controls="panelDecode">Decodificar</button>
+    <button type="button" id="btnHistory" class="tab-btn" role="tab" aria-selected="false" aria-controls="panelHistory">Histórico<span class="history-count" id="historyCount"></span></button>
   </div>
 
   <div class="card">
@@ -488,26 +615,40 @@ footer .foot-mark{ display:inline-block; margin:0 10px; opacity:.6; transform:tr
     </div>
 
     <!-- ENCODE PANEL -->
-    <div class="panel active" id="panelEncode">
+    <div class="panel active" id="panelEncode" role="tabpanel" aria-labelledby="btnEncode" tabindex="-1">
       <label for="inputEncode">Texto comum</label>
-      <textarea id="inputEncode" placeholder="Escreva aqui..." autofocus></textarea>
+      <div class="textarea-wrap">
+        <textarea id="inputEncode" placeholder="Escreva aqui..." autofocus maxlength="4000"></textarea>
+        <button type="button" class="textbox-clear" id="clearEncode" aria-label="Limpar texto" title="Limpar">×</button>
+        <span class="char-count" id="countEncode" aria-hidden="true"></span>
+      </div>
 
       <div class="divider"><svg viewBox="0 0 24 24"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" stroke="none"/></svg></div>
 
       <label>Em símbolos</label>
-      <div class="output-outer">
+      <div class="output-outer" id="outputOuterEncode">
         <div class="output-wrap">
           <div class="copy-btn-group">
-            <button class="copy-btn" id="copyEncodeImg">
+            <button class="copy-btn" id="downloadEncodeTxt" title="Baixar como .txt">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
+              <span>.txt</span>
+            </button>
+            <button class="copy-btn" id="copyEncodeImg" title="Copiar imagem (Ctrl+Enter)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="15" rx="1.5"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 15l-5.5-5-6 6"/></svg>
               <span>Imagem</span>
             </button>
           </div>
-          <div id="outputEncode"><p class="output-empty">O texto traduzido aparece aqui.</p></div>
+          <div id="outputEncode" aria-live="polite"><p class="output-empty">O texto traduzido aparece aqui.</p></div>
           <div class="wax-seal" aria-hidden="true">
             <svg viewBox="0 0 24 24"><path d="M12 3 L14 9 L20 10 L14 13 L12 20 L10 13 L4 10 L10 9 Z"/></svg>
           </div>
         </div>
+      </div>
+      <div class="output-tools">
+        <button type="button" class="present-btn" data-present-target="outputOuterEncode" aria-label="Modo apresentação" title="Tela cheia">
+          <svg class="icon-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+          <svg class="icon-collapse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>
+        </button>
       </div>
       <p class="reading-note">← sentido de leitura</p>
 
@@ -518,7 +659,7 @@ footer .foot-mark{ display:inline-block; margin:0 10px; opacity:.6; transform:tr
     </div>
 
     <!-- DECODE PANEL -->
-    <div class="panel" id="panelDecode">
+    <div class="panel" id="panelDecode" role="tabpanel" aria-labelledby="btnDecode" tabindex="-1">
       <label for="inputDecode">Símbolos (digite usando o alfabeto normal)</label>
 
       <details class="inline-key">
@@ -527,8 +668,10 @@ footer .foot-mark{ display:inline-block; margin:0 10px; opacity:.6; transform:tr
       </details>
 
       <div class="cipher-input-wrap">
-        <textarea id="inputDecode" class="cipher-input" placeholder="ex: nivlek"></textarea>
+        <textarea id="inputDecode" class="cipher-input" placeholder="ex: nivlek" maxlength="4000"></textarea>
         <div class="cipher-mirror" id="cipherMirror" aria-hidden="true"></div>
+        <button type="button" class="textbox-clear" id="clearDecode" aria-label="Limpar texto" title="Limpar">×</button>
+        <span class="char-count" id="countDecode" aria-hidden="true"></span>
       </div>
       <button type="button" id="btnInvert" class="invert-btn">
         <svg viewBox="0 0 24 24" width="15" height="15"><path d="M7 7h11M18 7l-3-3M18 7l-3 3M17 17H6M6 17l3-3M6 17l3 3" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -538,21 +681,31 @@ footer .foot-mark{ display:inline-block; margin:0 10px; opacity:.6; transform:tr
       <div class="divider"><svg viewBox="0 0 24 24"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" stroke="none"/></svg></div>
 
       <label>Texto comum</label>
-      <div class="output-outer">
+      <div class="output-outer" id="outputOuterDecode">
         <div class="output-wrap">
           <div class="copy-btn-group">
-            <button class="copy-btn" id="copyDecode">
+            <button class="copy-btn" id="downloadDecodeTxt" title="Baixar como .txt">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
+              <span>.txt</span>
+            </button>
+            <button class="copy-btn" id="copyDecode" title="Copiar texto (Ctrl+Enter)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="8" y="8" width="12" height="12" rx="1"/><path d="M5 16H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v1"/></svg>
               <span>Copiar</span>
             </button>
           </div>
-          <div id="outputDecode"><p class="output-empty">O texto decifrado aparece aqui.</p></div>
+          <div id="outputDecode" aria-live="polite"><p class="output-empty">O texto decifrado aparece aqui.</p></div>
         </div>
+      </div>
+      <div class="output-tools">
+        <button type="button" class="present-btn" data-present-target="outputOuterDecode" aria-label="Modo apresentação" title="Tela cheia">
+          <svg class="icon-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+          <svg class="icon-collapse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>
+        </button>
       </div>
     </div>
 
     <!-- HISTORY PANEL -->
-    <div class="panel" id="panelHistory">
+    <div class="panel" id="panelHistory" role="tabpanel" aria-labelledby="btnHistory" tabindex="-1">
       <label>Histórico de traduções</label>
       <div class="history-list" id="historyList">
         <p class="history-empty">Suas últimas traduções aparecem aqui.</p>
@@ -586,10 +739,36 @@ function activateTab(btn){
   TAB_PAIRS.forEach(([b, p]) => {
     const active = b === btn;
     b.classList.toggle("active", active);
+    b.setAttribute("aria-selected", String(active));
     p.classList.toggle("active", active);
   });
 }
 TAB_PAIRS.forEach(([b]) => b.addEventListener("click", () => activateTab(b)));
+document.getElementById("tabs").addEventListener("keydown", (e) => {
+  if(!["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) return;
+  const buttons = TAB_PAIRS.map(([b]) => b);
+  const i = buttons.indexOf(document.activeElement);
+  if(i === -1) return;
+  e.preventDefault();
+  let next;
+  if(e.key === "Home") next = 0;
+  else if(e.key === "End") next = buttons.length - 1;
+  else if(e.key === "ArrowRight") next = (i + 1) % buttons.length;
+  else next = (i - 1 + buttons.length) % buttons.length;
+  buttons[next].focus();
+  activateTab(buttons[next]);
+});
+
+// Coalesces bursts of "input" events (fast typing, IME composition, huge
+// pastes) into at most one re-render per animation frame.
+function rafThrottle(fn){
+  let scheduled = false;
+  return function(...args){
+    if(scheduled) return;
+    scheduled = true;
+    requestAnimationFrame(() => { scheduled = false; fn.apply(this, args); });
+  };
+}
 
 function playInk(el){
   el.classList.remove("ink-in");
@@ -597,11 +776,28 @@ function playInk(el){
   el.classList.add("ink-in");
 }
 // Reveals text one character at a time, like it's being freshly inked,
-// instead of the whole line fading in at once.
+// instead of the whole line fading in at once. For very long pasted text,
+// building hundreds of individually-animated spans would just be slow for
+// no visual benefit, so it falls back to a single soft fade instead.
+const INK_CHAR_LIMIT = 400;
 function animateReveal(el, text){
   el.innerHTML = "";
+  if(text.length > INK_CHAR_LIMIT){
+    el.textContent = text;
+    playInk(el);
+    return;
+  }
   const step = 14, maxDelay = 560;
   [...text].forEach((ch, i) => {
+    if(ch === "\n"){
+      // A "\n" only forces a real line break when it's a bare character in
+      // the flow; trapping it alone inside its own inline-block span (like
+      // every other character here) makes it inert — the browser treats
+      // that span as one atomic, zero-effect unit and never breaks there.
+      // A <br> always forces the break regardless of what's around it.
+      el.appendChild(document.createElement("br"));
+      return;
+    }
     const span = document.createElement("span");
     span.className = "ink-char";
     span.textContent = ch;
@@ -627,8 +823,14 @@ function reverseText(text){
 // Latin letters outside the site (it needs the font either way), while still
 // being real, selectable, searchable text.
 const PUA_BASE = 0xE000;
+// The font only has plain A-Z, so an accented letter (ã, é, ç...) has no
+// symbol of its own — it fell through untranslated before. Stripping the
+// accent first means it just borrows its base letter's symbol instead.
+function stripAccents(text){
+  return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
 function toGlyphs(text){
-  return text.replace(/[a-zA-Z]/g, ch => {
+  return stripAccents(text).replace(/[a-zA-Z]/g, ch => {
     const idx = ch.toLowerCase().charCodeAt(0) - 97;
     return String.fromCodePoint(PUA_BASE + idx);
   });
@@ -656,21 +858,34 @@ function fromGlyphs(text){
 // reverse the word order *within each line we just built*, so line order
 // top-to-bottom always matches typing order, and each line reads right
 // to left. Letters inside each word are already reversed by reverseText.
-function buildGlyphMeasurer(){
-  const m = document.createElement("div");
-  m.className = "glyph-line";
-  m.style.position = "absolute";
-  m.style.visibility = "hidden";
-  m.style.whiteSpace = "nowrap";
-  m.style.left = "-99999px";
-  m.style.top = "-99999px";
-  m.style.direction = "ltr";
-  document.body.appendChild(m);
-  return m;
+let glyphMeasurerEl = null;
+function getGlyphMeasurer(containerEl){
+  if(!glyphMeasurerEl){
+    glyphMeasurerEl = document.createElement("div");
+    glyphMeasurerEl.className = "glyph-line";
+    glyphMeasurerEl.style.position = "absolute";
+    glyphMeasurerEl.style.visibility = "hidden";
+    glyphMeasurerEl.style.whiteSpace = "nowrap";
+    glyphMeasurerEl.style.pointerEvents = "none";
+    glyphMeasurerEl.style.left = "-99999px";
+    glyphMeasurerEl.style.top = "0";
+    glyphMeasurerEl.style.direction = "ltr";
+  }
+  // Reparent into the real output container (not a detached spot under
+  // <body>) so it inherits whatever font-size actually applies there —
+  // including the much bigger, !important override used in fullscreen /
+  // "presenting" mode. Measuring at the wrong (smaller) size makes the
+  // line-wrap decision stale the moment the real text renders bigger than
+  // what was measured, and the browser then re-wraps it on its own,
+  // unpredictably, on top of our own inserted breaks.
+  if(glyphMeasurerEl.parentElement !== containerEl){
+    containerEl.appendChild(glyphMeasurerEl);
+  }
+  return glyphMeasurerEl;
 }
 function wrapGlyphLinesForDisplay(glyphText, containerEl){
   const maxWidth = containerEl.clientWidth;
-  const measurer = buildGlyphMeasurer();
+  const measurer = getGlyphMeasurer(containerEl);
   const outLines = [];
   const paragraphs = glyphText.split("\n");
   for(const para of paragraphs){
@@ -689,7 +904,6 @@ function wrapGlyphLinesForDisplay(glyphText, containerEl){
     }
     outLines.push(current.reverse().join(" "));
   }
-  document.body.removeChild(measurer);
   return outLines.join("\n");
 }
 
@@ -725,7 +939,7 @@ function renderEncode(){
   output.appendChild(line);
   animateReveal(line, wrapped);
 }
-document.getElementById("inputEncode").addEventListener("input", renderEncode);
+document.getElementById("inputEncode").addEventListener("input", rafThrottle(renderEncode));
 
 // Re-wrap whenever the output box's width actually changes (window resize,
 // the "chave do alfabeto" side/below toggle, mobile rotation) and once the
@@ -777,30 +991,106 @@ function renderDecode(){
   output.appendChild(line);
   animateReveal(line, decoded);
 }
-document.getElementById("inputDecode").addEventListener("input", renderDecode);
+document.getElementById("inputDecode").addEventListener("input", rafThrottle(renderDecode));
 updateCipherMirror();
 
 document.getElementById("btnInvert").addEventListener("click", () => {
   const field = document.getElementById("inputDecode");
   field.value = reverseText(fromGlyphs(field.value));
   renderDecode();
+  autoGrowCipherWrap();
   field.focus();
 });
 
+// ---- clear (×) buttons + character counters ----
+function wireClearButton(clearBtnId, textareaId, countId, renderFn, onAfterChange){
+  const btn = document.getElementById(clearBtnId);
+  const field = document.getElementById(textareaId);
+  const counter = document.getElementById(countId);
+  function updateChrome(){
+    const len = field.value.length;
+    btn.classList.toggle("show", len > 0);
+    if(counter){
+      counter.textContent = len > 0 ? `${len} / ${field.maxLength}` : "";
+      counter.classList.toggle("near-limit", field.maxLength - len < 200);
+    }
+  }
+  field.addEventListener("input", updateChrome);
+  btn.addEventListener("click", () => {
+    field.value = "";
+    updateChrome();
+    renderFn();
+    if(onAfterChange) onAfterChange();
+    field.focus();
+  });
+  updateChrome();
+}
+wireClearButton("clearEncode", "inputEncode", "countEncode", renderEncode, () => autoGrow(inputEncodeEl));
+wireClearButton("clearDecode", "inputDecode", "countDecode", renderDecode, () => autoGrowCipherWrap());
+
+// ---- auto-growing textareas (no manual resize handle needed) ----
+// The plain "Texto comum" box can just grow itself. The cipher-input box is
+// an invisible textarea layered under a visual mirror (see updateCipherMirror
+// above), so growing the *textarea* directly would fight the CSS that keeps
+// it pinned to its wrapper's full size — instead we grow the wrapper, and
+// both the real textarea and the mirror (height:100%) follow it automatically.
+function autoGrow(field){
+  field.style.height = "auto";
+  const capped = Math.min(field.scrollHeight, 420);
+  field.style.height = capped + "px";
+  field.style.overflowY = field.scrollHeight > 420 ? "auto" : "hidden";
+}
+const inputEncodeEl = document.getElementById("inputEncode");
+inputEncodeEl.addEventListener("input", () => autoGrow(inputEncodeEl));
+autoGrow(inputEncodeEl);
+
+function autoGrowCipherWrap(){
+  const field = document.getElementById("inputDecode");
+  const wrap = field.closest(".cipher-input-wrap");
+  const needed = Math.max(80, Math.min(field.scrollHeight, 420));
+  wrap.style.height = needed + "px";
+}
+document.getElementById("inputDecode").addEventListener("input", autoGrowCipherWrap);
+autoGrowCipherWrap();
+
 // ---- copy buttons ----
+// Falls back to the old execCommand trick when the async Clipboard API is
+// missing or blocked (older browsers, some in-app webviews, non-HTTPS
+// local files), so "Copiar" still works almost everywhere.
+async function copyTextRobust(text){
+  if(navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext !== false){
+    try{ await navigator.clipboard.writeText(text); return true; }catch(e){ /* fall through */ }
+  }
+  try{
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.left = "-9999px";
+    ta.style.top = "0";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    const ok = document.execCommand("copy");
+    document.body.removeChild(ta);
+    return ok;
+  }catch(e){
+    return false;
+  }
+}
 function wireCopy(btnId, getText){
   const btn = document.getElementById(btnId);
   btn.addEventListener("click", async () => {
     const text = getText();
     if(!text) return;
-    try{
-      await navigator.clipboard.writeText(text);
-      const label = btn.querySelector("span");
-      const prev = label.textContent;
-      btn.classList.add("copied");
-      label.textContent = "Copiado!";
-      setTimeout(() => { btn.classList.remove("copied"); label.textContent = prev; }, 1600);
-    }catch(e){}
+    const label = btn.querySelector("span");
+    const prev = label.textContent;
+    const ok = await copyTextRobust(text);
+    btn.classList.add(ok ? "copied" : "copy-error");
+    label.textContent = ok ? "Copiado!" : "Não copiou";
+    setTimeout(() => {
+      btn.classList.remove("copied", "copy-error");
+      label.textContent = prev;
+    }, 1600);
   });
 }
 wireCopy("copyDecode", () => {
@@ -1046,6 +1336,38 @@ document.getElementById("copyEncodeImg").addEventListener("click", (e) => {
   copyImageOrDownload(toGlyphs(reverseText(text)), e.currentTarget);
 });
 
+// ---- download as .txt ----
+function downloadTextFile(filename, content){
+  const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+function flashDownloaded(btn){
+  const label = btn.querySelector("span");
+  const prev = label.textContent;
+  btn.classList.add("copied");
+  label.textContent = "Baixado!";
+  setTimeout(() => { btn.classList.remove("copied"); label.textContent = prev; }, 1600);
+}
+document.getElementById("downloadEncodeTxt").addEventListener("click", (e) => {
+  const text = document.getElementById("inputEncode").value.trim();
+  if(!text) return;
+  addHistoryEntry("encode", text);
+  downloadTextFile("simbolos.txt", toGlyphs(reverseText(text)));
+  flashDownloaded(e.currentTarget);
+});
+document.getElementById("downloadDecodeTxt").addEventListener("click", (e) => {
+  const text = document.getElementById("inputDecode").value.trim();
+  if(!text) return;
+  addHistoryEntry("decode", text);
+  downloadTextFile("texto-decifrado.txt", fromGlyphs(text));
+  flashDownloaded(e.currentTarget);
+});
+
 // ---- key chart (shown inline in both encode and decode panels) ----
 const KEY_CHARS = ALPHABET.split("");
 const keyGridHTML = KEY_CHARS.map(ch => `
@@ -1107,10 +1429,12 @@ function renderHistory(){
         btnEncode.click();
         document.getElementById("inputEncode").value = entry.input;
         renderEncode();
+        autoGrow(inputEncodeEl);
       } else {
         btnDecode.click();
         document.getElementById("inputDecode").value = entry.input;
         renderDecode();
+        autoGrowCipherWrap();
       }
     });
     item.querySelector(".hi-del").addEventListener("click", (e) => {
@@ -1134,6 +1458,91 @@ document.getElementById("historyClear").addEventListener("click", () => {
   renderHistory();
 });
 renderHistory();
+
+// ---- keyboard shortcuts ----
+// Ctrl/Cmd+Enter copies the result of whichever tab is open; Esc blurs the
+// focused field (handy on mobile to dismiss the keyboard).
+document.addEventListener("keydown", (e) => {
+  const isSubmitCombo = (e.key === "Enter") && (e.ctrlKey || e.metaKey);
+  if(isSubmitCombo){
+    if(panelEncode.classList.contains("active")){
+      e.preventDefault();
+      document.getElementById("copyEncodeImg").click();
+    } else if(panelDecode.classList.contains("active")){
+      e.preventDefault();
+      document.getElementById("copyDecode").click();
+    }
+    return;
+  }
+  if(e.key === "Escape" && document.activeElement && document.activeElement.blur){
+    document.activeElement.blur();
+  }
+});
+
+// ---- output tools: presentation (fullscreen) mode ----
+// `.card` sets a CSS `perspective` (for the tab-switch unroll animation),
+// which per spec makes it a containing block for `position:fixed`
+// descendants — so a naive fixed overlay nested inside it would be trapped
+// inside the card instead of covering the viewport. When we can't use the
+// real Fullscreen API, we sidestep that by physically relocating the
+// element to <body> while presenting, then restoring it afterwards.
+function exitPresentingFallback(el){
+  el.classList.remove("presenting");
+  if(el._fsPlaceholder){
+    el._fsPlaceholder.replaceWith(el);
+    el._fsPlaceholder = null;
+  }
+}
+function enterPresentingFallback(el){
+  const placeholder = document.createComment("fs-placeholder");
+  el.before(placeholder);
+  el._fsPlaceholder = placeholder;
+  document.body.appendChild(el);
+  el.classList.add("presenting");
+}
+function toggleFullscreen(el){
+  const isNativeFs = document.fullscreenElement || document.webkitFullscreenElement;
+  if(el.classList.contains("presenting")){
+    exitPresentingFallback(el);
+    syncPresentButtonIcons();
+    return;
+  }
+  try{
+    if(!isNativeFs){
+      const req = el.requestFullscreen || el.webkitRequestFullscreen;
+      if(req){ req.call(el); return; }
+    } else {
+      const exit = document.exitFullscreen || document.webkitExitFullscreen;
+      if(exit){ exit.call(document); return; }
+    }
+  }catch(e){ /* fall through to the manual fallback below */ }
+  enterPresentingFallback(el);
+  syncPresentButtonIcons();
+}
+document.querySelectorAll(".present-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    toggleFullscreen(document.getElementById(btn.dataset.presentTarget));
+  });
+});
+// Keep each button's icon (expand/collapse) in sync with the real fullscreen
+// state, however it changes — our own button, Esc, or the browser's own UI.
+function syncPresentButtonIcons(){
+  document.querySelectorAll(".present-btn").forEach(btn => {
+    const target = document.getElementById(btn.dataset.presentTarget);
+    const active = target.classList.contains("presenting") ||
+      document.fullscreenElement === target || document.webkitFullscreenElement === target;
+    btn.classList.toggle("is-active", active);
+  });
+}
+document.addEventListener("fullscreenchange", syncPresentButtonIcons);
+document.addEventListener("webkitfullscreenchange", syncPresentButtonIcons);
+// Esc already exits real Fullscreen natively; also let it close our manual fallback.
+document.addEventListener("keydown", (e) => {
+  if(e.key === "Escape"){
+    document.querySelectorAll(".output-outer.presenting").forEach(exitPresentingFallback);
+    syncPresentButtonIcons();
+  }
+});
 
 // ---- particles ----
 const particleField = document.getElementById("particles");
