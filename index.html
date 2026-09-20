@@ -76,7 +76,7 @@ textarea:focus-visible{ outline-offset:0; }
 /* ---- print: just the parchment result, ready to cut out at the table ---- */
 @media print{
   body::before, .grain-overlay, .particles, .crest, .eyebrow, .header-flourish,
-  .tabs, .sub, footer, .inline-key, .invert-btn, .copy-btn-group, .skip-link,
+  .tabs, .sub, footer, .inline-key, .copy-btn-group, .skip-link,
   .output-tools, .textbox-clear, .char-count,
   #cipherMirror, textarea{
     display:none !important;
@@ -297,17 +297,6 @@ textarea::placeholder{ font-family:'EB Garamond', serif; font-style:italic; colo
 .cipher-input-wrap .textbox-clear{ top:8px; right:8px; }
 .cipher-input-wrap .char-count{ bottom:6px; right:10px; }
 .char-count.near-limit{ color:#c9a15a; opacity:.9; }
-
-.invert-btn{
-  display:inline-flex; align-items:center; gap:8px;
-  margin-top:12px; background:none; border:1px solid var(--line);
-  color:var(--teal-dim); font-family:'Cinzel', serif; font-size:.68rem; letter-spacing:.08em;
-  padding:9px 16px; border-radius:2px; cursor:pointer;
-  transition:border-color .25s, color .25s, box-shadow .25s, transform .15s;
-}
-.invert-btn:hover{ border-color:var(--teal); color:var(--ink); box-shadow:0 0 14px rgba(57,232,200,.18); }
-.invert-btn:active{ transform:scale(.97); }
-.invert-btn svg{ flex:none; }
 
 .divider{ display:flex; align-items:center; gap:14px; margin:26px 0; color:var(--line); }
 .divider::before,.divider::after{ content:""; flex:1; height:1px; background:var(--line); }
@@ -673,10 +662,6 @@ footer .foot-mark{ display:inline-block; margin:0 10px; opacity:.6; transform:tr
         <button type="button" class="textbox-clear" id="clearDecode" aria-label="Limpar texto" title="Limpar">×</button>
         <span class="char-count" id="countDecode" aria-hidden="true"></span>
       </div>
-      <button type="button" id="btnInvert" class="invert-btn">
-        <svg viewBox="0 0 24 24" width="15" height="15"><path d="M7 7h11M18 7l-3-3M18 7l-3 3M17 17H6M6 17l3-3M6 17l3 3" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Inverter ordem digitada
-      </button>
 
       <div class="divider"><svg viewBox="0 0 24 24"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" stroke="none"/></svg></div>
 
@@ -742,6 +727,11 @@ function activateTab(btn){
     b.setAttribute("aria-selected", String(active));
     p.classList.toggle("active", active);
   });
+  // Re-measure line-wrapping the moment this tab becomes visible again,
+  // rather than leaving whatever was last (possibly incorrectly) computed
+  // while it sat hidden — closes the door on any stale-measurement bug
+  // instead of just waiting for the user to notice and retype something.
+  if(btn === btnEncode) renderEncode();
 }
 TAB_PAIRS.forEach(([b]) => b.addEventListener("click", () => activateTab(b)));
 document.getElementById("tabs").addEventListener("keydown", (e) => {
@@ -895,7 +885,15 @@ function wrapGlyphLinesForDisplay(glyphText, containerEl){
     for(const word of words){
       const candidate = current.length ? current.join(" ") + " " + word : word;
       measurer.textContent = candidate;
-      if(current.length && maxWidth > 0 && measurer.getBoundingClientRect().width > maxWidth){
+      // scrollWidth (a plain layout metric, like clientWidth) is used
+      // instead of getBoundingClientRect().width on purpose: the latter
+      // reflects the element's *visually transformed* box, so if this runs
+      // while an ancestor is mid-way through the tab-switch "unroll"
+      // animation (a slight rotateX/scale), it can misreport the width —
+      // sometimes badly enough that almost nothing seems to fit, splitting
+      // every single word onto its own line. scrollWidth ignores transforms
+      // entirely and always matches how maxWidth itself was measured.
+      if(current.length && maxWidth > 0 && measurer.scrollWidth > maxWidth){
         outLines.push(current.reverse().join(" "));
         current = [word];
       } else {
@@ -993,14 +991,6 @@ function renderDecode(){
 }
 document.getElementById("inputDecode").addEventListener("input", rafThrottle(renderDecode));
 updateCipherMirror();
-
-document.getElementById("btnInvert").addEventListener("click", () => {
-  const field = document.getElementById("inputDecode");
-  field.value = reverseText(fromGlyphs(field.value));
-  renderDecode();
-  autoGrowCipherWrap();
-  field.focus();
-});
 
 // ---- clear (×) buttons + character counters ----
 function wireClearButton(clearBtnId, textareaId, countId, renderFn, onAfterChange){
