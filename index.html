@@ -78,7 +78,7 @@ textarea:focus-visible{ outline-offset:0; }
   body::before, .grain-overlay, .particles, .crest, .eyebrow, .header-flourish,
   .tabs, .sub, footer, .inline-key, .copy-btn-group, .skip-link,
   .output-tools, .textbox-clear, .char-count,
-  #cipherMirror, textarea{
+  textarea{
     display:none !important;
   }
   body{ background:#fff !important; }
@@ -245,35 +245,10 @@ textarea{
 }
 textarea.cipher-input{
   font-family:'Cronicas', serif; font-size:1.5rem; letter-spacing:.03em;
-  text-align:right;
-  position:relative; z-index:2;
-  color:transparent; caret-color:transparent; resize:none;
-}
-.cipher-input-wrap{
-  position:relative; min-height:80px;
-  background:var(--void-2); border:1px solid var(--line); border-radius:1px;
-  transition:border-color .2s;
-}
-.cipher-input-wrap:focus-within{ border-color:var(--teal); }
-.cipher-input-wrap .cipher-input{
-  position:absolute; inset:0; width:100%; height:100%;
-  background:transparent; border:none;
-}
-.cipher-input-wrap .cipher-input:focus{ outline:none; border:none; }
-.cipher-mirror{
-  position:absolute; inset:0; z-index:1; pointer-events:none;
-  padding:14px 16px; line-height:1.5;
-  font-family:'Cronicas', serif; font-size:1.5rem; letter-spacing:.03em;
-  color:var(--ink);
   direction:rtl; unicode-bidi:bidi-override; text-align:right;
-  overflow:hidden; overflow-wrap:break-word; word-break:break-word; white-space:pre-wrap;
+  color:var(--ink); caret-color:var(--teal);
 }
-.cipher-mirror .fake-caret{
-  display:inline-block; width:2px; height:1.1em; margin-left:2px;
-  background:var(--teal); vertical-align:middle; animation:caretBlink 1s step-end infinite;
-}
-@keyframes caretBlink{ 50%{ opacity:0; } }
-@media (prefers-reduced-motion:reduce){ .fake-caret{ animation:none; } }
+.cipher-input-wrap{ position:relative; }
 textarea:focus{ outline:none; border-color:var(--teal); }
 textarea::placeholder{ font-family:'EB Garamond', serif; font-style:italic; color:#3f5851; font-size:1rem; }
 
@@ -294,7 +269,7 @@ textarea::placeholder{ font-family:'EB Garamond', serif; font-style:italic; colo
   position:absolute; bottom:6px; right:10px; z-index:3; pointer-events:none;
   font-family:'Cinzel', serif; font-size:.6rem; letter-spacing:.05em; color:var(--teal-dim); opacity:.55;
 }
-.cipher-input-wrap .textbox-clear{ top:8px; right:8px; }
+.cipher-input-wrap .textbox-clear{ top:8px; left:8px; right:auto; }
 .cipher-input-wrap .char-count{ bottom:6px; right:10px; }
 .char-count.near-limit{ color:#c9a15a; opacity:.9; }
 
@@ -595,6 +570,7 @@ footer .foot-mark{ display:inline-block; margin:0 10px; opacity:.6; transform:tr
   <div class="tabs" id="tabs" role="tablist" aria-label="Modo do tradutor">
     <button type="button" id="btnEncode" class="tab-btn active" role="tab" aria-selected="true" aria-controls="panelEncode">Codificar</button>
     <button type="button" id="btnDecode" class="tab-btn" role="tab" aria-selected="false" aria-controls="panelDecode">Decodificar</button>
+    <button type="button" id="btnMaster" class="tab-btn" role="tab" aria-selected="false" aria-controls="panelMaster">Área do Mestre</button>
     <button type="button" id="btnHistory" class="tab-btn" role="tab" aria-selected="false" aria-controls="panelHistory">Histórico<span class="history-count" id="historyCount"></span></button>
   </div>
 
@@ -658,7 +634,6 @@ footer .foot-mark{ display:inline-block; margin:0 10px; opacity:.6; transform:tr
 
       <div class="cipher-input-wrap">
         <textarea id="inputDecode" class="cipher-input" placeholder="ex: nivlek" maxlength="4000"></textarea>
-        <div class="cipher-mirror" id="cipherMirror" aria-hidden="true"></div>
         <button type="button" class="textbox-clear" id="clearDecode" aria-label="Limpar texto" title="Limpar">×</button>
         <span class="char-count" id="countDecode" aria-hidden="true"></span>
       </div>
@@ -689,6 +664,37 @@ footer .foot-mark{ display:inline-block; margin:0 10px; opacity:.6; transform:tr
       </div>
     </div>
 
+    <!-- MASTER PANEL: plain reversed text, no glyph font — a quick, -->
+    <!-- font-free reference for the GM to read/write without symbols -->
+    <div class="panel" id="panelMaster" role="tabpanel" aria-labelledby="btnMaster" tabindex="-1">
+      <label for="inputMaster">Texto comum</label>
+      <div class="textarea-wrap">
+        <textarea id="inputMaster" placeholder="Escreva aqui..." maxlength="4000"></textarea>
+        <button type="button" class="textbox-clear" id="clearMaster" aria-label="Limpar texto" title="Limpar">×</button>
+        <span class="char-count" id="countMaster" aria-hidden="true"></span>
+      </div>
+
+      <div class="divider"><svg viewBox="0 0 24 24"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" stroke="none"/></svg></div>
+
+      <label>Texto invertido (sem símbolos)</label>
+      <div class="output-outer" id="outputOuterMaster">
+        <div class="output-wrap">
+          <div class="copy-btn-group">
+            <button class="copy-btn" id="downloadMasterTxt" title="Baixar como .txt">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg>
+              <span>.txt</span>
+            </button>
+            <button class="copy-btn" id="copyMaster" title="Copiar texto (Ctrl+Enter)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="8" y="8" width="12" height="12" rx="1"/><path d="M5 16H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v1"/></svg>
+              <span>Copiar</span>
+            </button>
+          </div>
+          <div id="outputMaster" aria-live="polite"><p class="output-empty">O texto invertido aparece aqui.</p></div>
+        </div>
+      </div>
+      <p class="reading-note">Só as letras invertidas, sem os símbolos — pra você, mestre, ler e escrever rápido sem precisar da fonte.</p>
+    </div>
+
     <!-- HISTORY PANEL -->
     <div class="panel" id="panelHistory" role="tabpanel" aria-labelledby="btnHistory" tabindex="-1">
       <label>Histórico de traduções</label>
@@ -707,17 +713,20 @@ footer .foot-mark{ display:inline-block; margin:0 10px; opacity:.6; transform:tr
 <script>
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-// ---- tab switching (Codificar / Decodificar / Histórico) ----
+// ---- tab switching (Codificar / Decodificar / Área do Mestre / Histórico) ----
 const btnEncode = document.getElementById("btnEncode");
 const btnDecode = document.getElementById("btnDecode");
+const btnMaster = document.getElementById("btnMaster");
 const btnHistory = document.getElementById("btnHistory");
 const panelEncode = document.getElementById("panelEncode");
 const panelDecode = document.getElementById("panelDecode");
+const panelMaster = document.getElementById("panelMaster");
 const panelHistory = document.getElementById("panelHistory");
 
 const TAB_PAIRS = [
   [btnEncode, panelEncode],
   [btnDecode, panelDecode],
+  [btnMaster, panelMaster],
   [btnHistory, panelHistory],
 ];
 function activateTab(btn){
@@ -962,17 +971,7 @@ if(document.fonts && document.fonts.ready){
 }
 
 // ---- decode ----
-function updateCipherMirror(){
-  const raw = document.getElementById("inputDecode").value;
-  const mirror = document.getElementById("cipherMirror");
-  mirror.textContent = raw;
-  const caret = document.createElement("span");
-  caret.className = "fake-caret";
-  mirror.appendChild(caret);
-}
-
 function renderDecode(){
-  updateCipherMirror();
   const text = document.getElementById("inputDecode").value.trim();
   const output = document.getElementById("outputDecode");
   if(!text){
@@ -990,7 +989,37 @@ function renderDecode(){
   animateReveal(line, decoded);
 }
 document.getElementById("inputDecode").addEventListener("input", rafThrottle(renderDecode));
-updateCipherMirror();
+
+// ---- master (GM area): plain reversed text, no glyph symbols ----
+// Matches exactly what a single line of the symbol output reads as (each
+// word's letters reversed, AND the words themselves in reverse order) —
+// just spelled out in plain letters instead of runes.
+function reverseWordsAndLetters(text){
+  return text.split("\n").map(para => {
+    const words = para.split(/\s+/).filter(Boolean);
+    if(words.length === 0) return "";
+    return words.map(w => w.split("").reverse().join("")).reverse().join(" ");
+  }).join("\n");
+}
+let masterWasEmpty = true;
+function renderMaster(){
+  const text = document.getElementById("inputMaster").value.trim();
+  const output = document.getElementById("outputMaster");
+  if(!text){
+    output.innerHTML = '<p class="output-empty">O texto invertido aparece aqui.</p>';
+    masterWasEmpty = true;
+    return;
+  }
+  if(masterWasEmpty) rollParchmentAge(output.closest(".output-wrap"));
+  masterWasEmpty = false;
+  const line = document.createElement("div");
+  line.className = "plain-line";
+  const reversed = reverseWordsAndLetters(text);
+  output.innerHTML = "";
+  output.appendChild(line);
+  animateReveal(line, reversed);
+}
+document.getElementById("inputMaster").addEventListener("input", rafThrottle(renderMaster));
 
 // ---- clear (×) buttons + character counters ----
 function wireClearButton(clearBtnId, textareaId, countId, renderFn, onAfterChange){
@@ -1016,14 +1045,11 @@ function wireClearButton(clearBtnId, textareaId, countId, renderFn, onAfterChang
   updateChrome();
 }
 wireClearButton("clearEncode", "inputEncode", "countEncode", renderEncode, () => autoGrow(inputEncodeEl));
-wireClearButton("clearDecode", "inputDecode", "countDecode", renderDecode, () => autoGrowCipherWrap());
+wireClearButton("clearDecode", "inputDecode", "countDecode", renderDecode, () => autoGrow(inputDecodeEl));
+wireClearButton("clearMaster", "inputMaster", "countMaster", renderMaster, () => autoGrow(inputMasterEl));
 
 // ---- auto-growing textareas (no manual resize handle needed) ----
-// The plain "Texto comum" box can just grow itself. The cipher-input box is
-// an invisible textarea layered under a visual mirror (see updateCipherMirror
-// above), so growing the *textarea* directly would fight the CSS that keeps
-// it pinned to its wrapper's full size — instead we grow the wrapper, and
-// both the real textarea and the mirror (height:100%) follow it automatically.
+// ---- auto-growing textareas (no manual resize handle needed) ----
 function autoGrow(field){
   field.style.height = "auto";
   const capped = Math.min(field.scrollHeight, 420);
@@ -1034,14 +1060,13 @@ const inputEncodeEl = document.getElementById("inputEncode");
 inputEncodeEl.addEventListener("input", () => autoGrow(inputEncodeEl));
 autoGrow(inputEncodeEl);
 
-function autoGrowCipherWrap(){
-  const field = document.getElementById("inputDecode");
-  const wrap = field.closest(".cipher-input-wrap");
-  const needed = Math.max(80, Math.min(field.scrollHeight, 420));
-  wrap.style.height = needed + "px";
-}
-document.getElementById("inputDecode").addEventListener("input", autoGrowCipherWrap);
-autoGrowCipherWrap();
+const inputDecodeEl = document.getElementById("inputDecode");
+inputDecodeEl.addEventListener("input", () => autoGrow(inputDecodeEl));
+autoGrow(inputDecodeEl);
+
+const inputMasterEl = document.getElementById("inputMaster");
+inputMasterEl.addEventListener("input", () => autoGrow(inputMasterEl));
+autoGrow(inputMasterEl);
 
 // ---- copy buttons ----
 // Falls back to the old execCommand trick when the async Clipboard API is
@@ -1087,6 +1112,10 @@ wireCopy("copyDecode", () => {
   const text = document.getElementById("inputDecode").value.trim();
   if(text) addHistoryEntry("decode", text);
   return text ? fromGlyphs(text) : "";
+});
+wireCopy("copyMaster", () => {
+  const text = document.getElementById("inputMaster").value.trim();
+  return text ? reverseWordsAndLetters(text) : "";
 });
 
 // ---- copy as image (for pasting where the Cronicas font isn't installed) ----
@@ -1405,6 +1434,12 @@ document.getElementById("downloadDecodeTxt").addEventListener("click", (e) => {
   downloadTextFile("texto-decifrado.txt", fromGlyphs(text));
   flashDownloaded(e.currentTarget);
 });
+document.getElementById("downloadMasterTxt").addEventListener("click", (e) => {
+  const text = document.getElementById("inputMaster").value.trim();
+  if(!text) return;
+  downloadTextFile("texto-invertido.txt", reverseWordsAndLetters(text));
+  flashDownloaded(e.currentTarget);
+});
 
 // ---- key chart (shown inline in both encode and decode panels) ----
 const KEY_CHARS = ALPHABET.split("");
@@ -1472,7 +1507,7 @@ function renderHistory(){
         btnDecode.click();
         document.getElementById("inputDecode").value = entry.input;
         renderDecode();
-        autoGrowCipherWrap();
+        autoGrow(inputDecodeEl);
       }
     });
     item.querySelector(".hi-del").addEventListener("click", (e) => {
@@ -1509,6 +1544,9 @@ document.addEventListener("keydown", (e) => {
     } else if(panelDecode.classList.contains("active")){
       e.preventDefault();
       document.getElementById("copyDecode").click();
+    } else if(panelMaster.classList.contains("active")){
+      e.preventDefault();
+      document.getElementById("copyMaster").click();
     }
     return;
   }
