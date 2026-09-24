@@ -77,7 +77,7 @@ textarea:focus-visible{ outline-offset:0; }
 @media print{
   body::before, .grain-overlay, .particles, .crest, .eyebrow, .header-flourish,
   .tabs, .sub, footer, .inline-key, .copy-btn-group, .skip-link,
-  .output-tools, .textbox-clear, .char-count,
+  .output-tools, .input-tools, .textbox-clear, .char-count,
   textarea{
     display:none !important;
   }
@@ -272,6 +272,20 @@ textarea::placeholder{ font-family:'EB Garamond', serif; font-style:italic; colo
 .cipher-input-wrap .textbox-clear{ top:8px; left:8px; right:auto; }
 .cipher-input-wrap .char-count{ bottom:6px; right:10px; }
 .char-count.near-limit{ color:#c9a15a; opacity:.9; }
+
+/* ---- "inverter ordem das palavras" button (below Codificar / Decodificar inputs) ---- */
+.input-tools{ display:flex; justify-content:flex-end; flex-wrap:wrap; gap:8px; margin-top:8px; }
+.tool-btn{
+  display:flex; align-items:center; gap:7px;
+  background:var(--void-2); border:1px solid var(--line); color:var(--teal-dim);
+  font-family:'Cinzel', serif; font-size:.62rem; letter-spacing:.08em;
+  padding:7px 11px; border-radius:2px; cursor:pointer;
+  transition:color .2s, border-color .2s, box-shadow .2s, transform .15s;
+}
+.tool-btn:hover{ color:var(--ink); border-color:var(--teal-dim); box-shadow:0 0 10px rgba(57,232,200,.12); }
+.tool-btn:active{ transform:scale(.97); }
+.tool-btn svg{ width:13px; height:13px; flex:none; }
+.tool-btn.flipped{ color:var(--teal); border-color:var(--teal); }
 
 .divider{ display:flex; align-items:center; gap:14px; margin:26px 0; color:var(--line); }
 .divider::before,.divider::after{ content:""; flex:1; height:1px; background:var(--line); }
@@ -587,6 +601,16 @@ footer .foot-mark{ display:inline-block; margin:0 10px; opacity:.6; transform:tr
         <button type="button" class="textbox-clear" id="clearEncode" aria-label="Limpar texto" title="Limpar">×</button>
         <span class="char-count" id="countEncode" aria-hidden="true"></span>
       </div>
+      <div class="input-tools">
+        <button type="button" class="tool-btn" id="flipLettersEncode" title="Inverte as letras de cada palavra (Kelvin → nivleK)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H4m0 0l5-5m-5 5l5 5"/></svg>
+          <span>Inverter letras das palavras</span>
+        </button>
+        <button type="button" class="tool-btn" id="flipEncode" title="Inverte a ordem das palavras (Kelvin Theodoro Dantas → Dantas Theodoro Kelvin)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4L3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></svg>
+          <span>Inverter ordem das palavras</span>
+        </button>
+      </div>
 
       <div class="divider"><svg viewBox="0 0 24 24"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" stroke="none"/></svg></div>
 
@@ -636,6 +660,16 @@ footer .foot-mark{ display:inline-block; margin:0 10px; opacity:.6; transform:tr
         <textarea id="inputDecode" class="cipher-input" placeholder="ex: nivlek" maxlength="4000"></textarea>
         <button type="button" class="textbox-clear" id="clearDecode" aria-label="Limpar texto" title="Limpar">×</button>
         <span class="char-count" id="countDecode" aria-hidden="true"></span>
+      </div>
+      <div class="input-tools">
+        <button type="button" class="tool-btn" id="flipLettersDecode" title="Inverte as letras de cada palavra digitada (Kelvin → nivleK)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H4m0 0l5-5m-5 5l5 5"/></svg>
+          <span>Inverter letras das palavras</span>
+        </button>
+        <button type="button" class="tool-btn" id="flipDecode" title="Inverte a ordem das palavras digitadas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4L3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></svg>
+          <span>Inverter ordem das palavras</span>
+        </button>
       </div>
 
       <div class="divider"><svg viewBox="0 0 24 24"><path d="M12 2 L14 10 L22 12 L14 14 L12 22 L10 14 L2 12 L10 10 Z" stroke="none"/></svg></div>
@@ -778,6 +812,11 @@ function playInk(el){
 // instead of the whole line fading in at once. For very long pasted text,
 // building hundreds of individually-animated spans would just be slow for
 // no visual benefit, so it falls back to a single soft fade instead.
+// The reveal order follows the site's own reading direction: within each
+// line it starts from the *right* (where the first word you typed sits)
+// and moves left, and line 1 finishes before line 2 starts — matching how
+// the text is actually meant to be read, instead of a plain left-to-right
+// sweep that would ink in the LAST word first.
 const INK_CHAR_LIMIT = 400;
 function animateReveal(el, text){
   el.innerHTML = "";
@@ -786,22 +825,20 @@ function animateReveal(el, text){
     playInk(el);
     return;
   }
-  const step = 14, maxDelay = 560;
-  [...text].forEach((ch, i) => {
-    if(ch === "\n"){
-      // A "\n" only forces a real line break when it's a bare character in
-      // the flow; trapping it alone inside its own inline-block span (like
-      // every other character here) makes it inert — the browser treats
-      // that span as one atomic, zero-effect unit and never breaks there.
-      // A <br> always forces the break regardless of what's around it.
-      el.appendChild(document.createElement("br"));
-      return;
-    }
-    const span = document.createElement("span");
-    span.className = "ink-char";
-    span.textContent = ch;
-    span.style.animationDelay = Math.min(i * step, maxDelay) + "ms";
-    el.appendChild(span);
+  const step = 14, maxDelayPerLine = 560, lineStagger = 260;
+  const lines = text.split("\n");
+  lines.forEach((line, li) => {
+    const chars = [...line];
+    const lineStart = li * lineStagger;
+    chars.forEach((ch, i) => {
+      const distanceFromRight = chars.length - 1 - i;
+      const span = document.createElement("span");
+      span.className = "ink-char";
+      span.textContent = ch;
+      span.style.animationDelay = (lineStart + Math.min(distanceFromRight * step, maxDelayPerLine)) + "ms";
+      el.appendChild(span);
+    });
+    if(li < lines.length - 1) el.appendChild(document.createElement("br"));
   });
 }
 
@@ -857,19 +894,25 @@ function fromGlyphs(text){
 // reverse the word order *within each line we just built*, so line order
 // top-to-bottom always matches typing order, and each line reads right
 // to left. Letters inside each word are already reversed by reverseText.
-let glyphMeasurerEl = null;
-function getGlyphMeasurer(containerEl){
-  if(!glyphMeasurerEl){
-    glyphMeasurerEl = document.createElement("div");
-    glyphMeasurerEl.className = "glyph-line";
-    glyphMeasurerEl.style.position = "absolute";
-    glyphMeasurerEl.style.visibility = "hidden";
-    glyphMeasurerEl.style.whiteSpace = "nowrap";
-    glyphMeasurerEl.style.pointerEvents = "none";
-    glyphMeasurerEl.style.left = "-99999px";
-    glyphMeasurerEl.style.top = "0";
-    glyphMeasurerEl.style.direction = "ltr";
+// The same wrapping algorithm is reused for the "Área do Mestre" panel too
+// (plain letters instead of symbols), so it needs its own measurer keyed
+// by which font/size actually applies — glyph-line (Cronicas) vs
+// plain-line (EB Garamond) render at very different widths per character.
+const lineMeasurers = {};
+function getLineMeasurer(containerEl, className){
+  if(!lineMeasurers[className]){
+    const el = document.createElement("div");
+    el.className = className;
+    el.style.position = "absolute";
+    el.style.visibility = "hidden";
+    el.style.whiteSpace = "nowrap";
+    el.style.pointerEvents = "none";
+    el.style.left = "-99999px";
+    el.style.top = "0";
+    el.style.direction = "ltr";
+    lineMeasurers[className] = el;
   }
+  const measurer = lineMeasurers[className];
   // Reparent into the real output container (not a detached spot under
   // <body>) so it inherits whatever font-size actually applies there —
   // including the much bigger, !important override used in fullscreen /
@@ -877,16 +920,23 @@ function getGlyphMeasurer(containerEl){
   // line-wrap decision stale the moment the real text renders bigger than
   // what was measured, and the browser then re-wraps it on its own,
   // unpredictably, on top of our own inserted breaks.
-  if(glyphMeasurerEl.parentElement !== containerEl){
-    containerEl.appendChild(glyphMeasurerEl);
+  if(measurer.parentElement !== containerEl){
+    containerEl.appendChild(measurer);
   }
-  return glyphMeasurerEl;
+  return measurer;
 }
-function wrapGlyphLinesForDisplay(glyphText, containerEl){
-  const maxWidth = containerEl.clientWidth;
-  const measurer = getGlyphMeasurer(containerEl);
+function wrapLinesForDisplay(text, containerEl, className){
+  // A small safety margin, not the raw container width: two separate DOM
+  // elements (this hidden measurer and the real, later-rendered line) can
+  // disagree by a pixel or two — italic fonts especially can have a little
+  // slanted overhang — so measuring right up against the exact edge risks
+  // the browser's own overflow-wrap kicking in afterwards and breaking a
+  // word in half. Wrapping one word earlier than strictly necessary avoids
+  // ever landing that close to the edge.
+  const maxWidth = containerEl.clientWidth - 12;
+  const measurer = getLineMeasurer(containerEl, className);
   const outLines = [];
-  const paragraphs = glyphText.split("\n");
+  const paragraphs = text.split("\n");
   for(const para of paragraphs){
     const words = para.split(/\s+/).filter(Boolean);
     if(words.length === 0){ outLines.push(""); continue; }
@@ -941,7 +991,7 @@ function renderEncode(){
   const glyphText = toGlyphs(reverseText(text));
   const line = document.createElement("div");
   line.className = "glyph-line";
-  const wrapped = wrapGlyphLinesForDisplay(glyphText, output);
+  const wrapped = wrapLinesForDisplay(glyphText, output, "glyph-line");
   output.innerHTML = "";
   output.appendChild(line);
   animateReveal(line, wrapped);
@@ -991,9 +1041,10 @@ function renderDecode(){
 document.getElementById("inputDecode").addEventListener("input", rafThrottle(renderDecode));
 
 // ---- master (GM area): plain reversed text, no glyph symbols ----
-// Matches exactly what a single line of the symbol output reads as (each
-// word's letters reversed, AND the words themselves in reverse order) —
-// just spelled out in plain letters instead of runes.
+// Same idea as encode's copyable value (toGlyphs(reverseText(text))):
+// each word's letters reversed AND the words themselves in reverse order,
+// as ONE continuous transform with no width-aware line wrapping — the
+// right form for a single copy/paste value, not for on-screen display.
 function reverseWordsAndLetters(text){
   return text.split("\n").map(para => {
     const words = para.split(/\s+/).filter(Boolean);
@@ -1014,10 +1065,15 @@ function renderMaster(){
   masterWasEmpty = false;
   const line = document.createElement("div");
   line.className = "plain-line";
-  const reversed = reverseWordsAndLetters(text);
+  // Same pipeline as the symbol output (reverse letters per word, keep
+  // typed word order, THEN let the width-aware wrapper reverse word order
+  // *within each real rendered line*) — just skipping the symbol mapping,
+  // so line breaks land in the same correct places as in Codificar.
+  const lettersReversed = reverseText(text);
+  const wrapped = wrapLinesForDisplay(lettersReversed, output, "plain-line");
   output.innerHTML = "";
   output.appendChild(line);
-  animateReveal(line, reversed);
+  animateReveal(line, wrapped);
 }
 document.getElementById("inputMaster").addEventListener("input", rafThrottle(renderMaster));
 
@@ -1067,6 +1123,47 @@ autoGrow(inputDecodeEl);
 const inputMasterEl = document.getElementById("inputMaster");
 inputMasterEl.addEventListener("input", () => autoGrow(inputMasterEl));
 autoGrow(inputMasterEl);
+
+// ---- "inverter ordem das palavras" (Codificar / Decodificar) ----
+// Rewrites the text in the box so the WORDS come in the opposite order
+// ("Kelvin Theodoro Dantas" -> "Dantas Theodoro Kelvin"). The letters inside
+// each word are left exactly as typed — the normal cipher rules (letters
+// reversed per word, accents stripped, symbol mapping) then apply on top of
+// the new order like for any other text. It's a one-shot edit of the box's
+// value, with no hidden state, so clicking it again simply restores the
+// original order. Line breaks stay where they are (each line is reversed
+// on its own) and the original spacing between words is preserved.
+function reverseWordOrder(text){
+  return text.split("\n").map(line => {
+    const chunks = line.split(/(\s+)/);          // words at even indexes, spacing at odd
+    const slots = [];
+    chunks.forEach((c, i) => { if(i % 2 === 0 && c !== "") slots.push(i); });
+    const words = slots.map(i => chunks[i]).reverse();
+    slots.forEach((i, n) => { chunks[i] = words[n]; });
+    return chunks.join("");
+  }).join("\n");
+}
+function wireFlipButton(btnId, textareaId, transform = reverseWordOrder){
+  const btn = document.getElementById(btnId);
+  const field = document.getElementById(textareaId);
+  btn.addEventListener("click", () => {
+    if(!field.value.trim()) return;
+    field.value = transform(field.value);
+    // Fire the normal "input" event so the output, the counter, the ×
+    // button and the auto-grow all update exactly as if it had been typed.
+    field.dispatchEvent(new Event("input", { bubbles: true }));
+    btn.classList.add("flipped");
+    setTimeout(() => btn.classList.remove("flipped"), 700);
+  });
+}
+wireFlipButton("flipEncode", "inputEncode");
+wireFlipButton("flipDecode", "inputDecode");
+// "Inverter letras das palavras": Kelvin -> nivleK, word order untouched.
+// Reuses reverseText as-is (letters reversed per word, spacing and line
+// breaks kept), so it's the exact mirror of the button above; clicking
+// twice restores the original text.
+wireFlipButton("flipLettersEncode", "inputEncode", reverseText);
+wireFlipButton("flipLettersDecode", "inputDecode", reverseText);
 
 // ---- copy buttons ----
 // Falls back to the old execCommand trick when the async Clipboard API is
