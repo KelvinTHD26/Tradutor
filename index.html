@@ -12,7 +12,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-<style>
+<style>/* =====================================================================
+   Crônicas do Vazio Atômico — estilos
+   Cores e fontes vêm das variáveis em :root (--void, --ink, --teal...).
+   Ordem geral: base e fundo · abas · caixas de texto · pergaminho (saída)
+   · botões · histórico · modo apresentação · impressão (@media print).
+   O src da fonte Cronicas é preenchido pelo build.py.
+   ===================================================================== */
+
 /* If the Google Fonts request fails or is blocked (offline, ad-blockers,
    restricted networks), everything still reads fine — Cinzel/EB Garamond
    are only ever referenced alongside a generic 'serif' fallback below,
@@ -77,7 +84,7 @@ textarea:focus-visible{ outline-offset:0; }
 @media print{
   body::before, .grain-overlay, .particles, .crest, .eyebrow, .header-flourish,
   .tabs, .sub, footer, .inline-key, .copy-btn-group, .skip-link,
-  .output-tools, .input-tools, .textbox-clear, .char-count,
+  .output-tools, .input-tools, .font-help, .textbox-clear, .char-count,
   textarea{
     display:none !important;
   }
@@ -285,7 +292,14 @@ textarea::placeholder{ font-family:'EB Garamond', serif; font-style:italic; colo
 .tool-btn:hover{ color:var(--ink); border-color:var(--teal-dim); box-shadow:0 0 10px rgba(57,232,200,.12); }
 .tool-btn:active{ transform:scale(.97); }
 .tool-btn svg{ width:13px; height:13px; flex:none; }
-.tool-btn.flipped{ color:var(--teal); border-color:var(--teal); }
+.tool-btn.flipped, .tool-btn.copied{ color:var(--teal); border-color:var(--teal); }
+.output-tools .tool-btn{ margin-right:auto; }
+
+/* ---- "símbolos quebrados fora do site?" help ---- */
+.font-help{ margin:22px 0 0; border:1px solid var(--line); background:var(--void-2); border-radius:2px; padding:10px 14px; color:var(--ink); font-family:'EB Garamond', serif; }
+.font-help summary{ cursor:pointer; font-family:'Cinzel', serif; font-size:.68rem; letter-spacing:.1em; color:var(--teal-dim); }
+.font-help p, .font-help li{ font-size:.98rem; line-height:1.5; }
+.font-help ol{ padding-left:20px; margin:10px 0; }
 
 .divider{ display:flex; align-items:center; gap:14px; margin:26px 0; color:var(--line); }
 .divider::before,.divider::after{ content:""; flex:1; height:1px; background:var(--line); }
@@ -398,23 +412,15 @@ textarea::placeholder{ font-family:'EB Garamond', serif; font-style:italic; colo
 .copy-btn.copied{ color:#2a5a44; border-color:#2a5a44; box-shadow:0 0 10px rgba(42,90,68,.35); }
 .copy-btn.copy-error{ color:#8a3a3a; border-color:#8a3a3a; }
 
-/* On narrow phones, two side-by-side buttons with full labels in that
-   absolutely-positioned top-right corner get cramped against the parchment's
-   edge — stack them instead so each keeps its label (needed for the
-   "Copiado!"/"Baixado!" feedback text) without hiding anything. */
-@media (max-width:480px){
-  .copy-btn-group{ top:10px; right:10px; flex-direction:column; align-items:flex-end; gap:5px; }
-  .copy-btn{ padding:6px 9px; font-size:.58rem; }
-  .output-wrap{ padding-top:58px; }
-}
-
-/* On narrow phones, two buttons with full labels in that absolutely-
-   positioned top-right corner get cramped against the parchment's edge
-   and can crowd the text below — shrink to icon-only there instead. */
+/* On narrow phones the buttons in the parchment's top-right corner shrink to
+   icon-only so they don't crowd the text — but while a button is showing
+   its feedback ("Copiado!" / "Baixado!" / "Não copiou") the label comes
+   back, so the confirmation is never invisible on a phone. */
 @media (max-width:480px){
   .copy-btn-group{ top:10px; right:10px; gap:5px; }
   .copy-btn{ padding:7px 8px; }
   .copy-btn span{ display:none; }
+  .copy-btn.copied span, .copy-btn.copy-error span{ display:inline; }
   .output-wrap{ padding-top:46px; }
 }
 
@@ -520,6 +526,10 @@ textarea::placeholder{ font-family:'EB Garamond', serif; font-style:italic; colo
 .history-item .hi-glyph{
   font-family:'Cronicas', serif; color:var(--teal-dim); font-size:.95rem;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis; direction:rtl; text-align:left;
+}
+.history-item .hi-master{
+  font-family:'EB Garamond', serif; color:var(--teal-dim); font-size:.85rem;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 .history-item .hi-tag{
   flex:none; font-family:'Cinzel', serif; font-size:.55rem; letter-spacing:.06em;
@@ -634,6 +644,10 @@ footer .foot-mark{ display:inline-block; margin:0 10px; opacity:.6; transform:tr
         </div>
       </div>
       <div class="output-tools">
+        <button type="button" class="tool-btn" id="sendToDecode" title="Manda o resultado para a aba Decodificar, como se fosse colado lá">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m0 0l-5-5m5 5l-5 5"/></svg>
+          <span>Testar na Decodificar</span>
+        </button>
         <button type="button" class="present-btn" data-present-target="outputOuterEncode" aria-label="Modo apresentação" title="Tela cheia">
           <svg class="icon-expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
           <svg class="icon-collapse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>
@@ -740,11 +754,52 @@ footer .foot-mark{ display:inline-block; margin:0 10px; opacity:.6; transform:tr
 
   </div>
 
+  <details class="font-help">
+    <summary>Os símbolos aparecem quebrados fora do site?</summary>
+    <p>Os símbolos só existem com a fonte <b>Cronicas</b>. Sem ela, o texto copiado vira quadradinhos ou ícones aleatórios. Três jeitos de resolver:</p>
+    <ol>
+      <li><b>Imagem:</b> na aba Codificar, copie o resultado como imagem e cole no Discord, WhatsApp etc. Não precisa de fonte.</li>
+      <li><b>Instalar a fonte:</b> baixe abaixo, instale no aparelho e escolha “Cronicas” no programa (Word, Docs...). O texto copiado passa a aparecer como símbolos.</li>
+      <li><b>Voltar ao site:</b> cole o texto copiado na aba Decodificar.</li>
+    </ol>
+    <button type="button" class="tool-btn" id="downloadFont">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 20h14"/></svg>
+      <span>Baixar fonte Cronicas (.ttf)</span>
+    </button>
+  </details>
+
   <footer><span class="foot-mark" aria-hidden="true">✦</span>cada palavra se dobra sobre si mesma · lida do fim para o início<span class="foot-mark" aria-hidden="true">✦</span></footer>
 </div>
 </div>
 
-<script>
+<script>/* =====================================================================
+   Crônicas do Vazio Atômico — tradutor do alfabeto
+   ---------------------------------------------------------------------
+   A cifra: cada palavra tem as letras invertidas (a ordem das palavras
+   fica) e cada letra vira um símbolo da fonte Cronicas, guardado como
+   caractere da área privada do Unicode (U+E000 = A ... U+E019 = Z).
+   Sem maiúsculas/minúsculas, sem números e sem acentos (ã -> a).
+
+   Abas: Codificar · Decodificar · Área do Mestre · Histórico
+   Codificar e Área do Mestre compartilham o texto ao trocar de aba.
+
+   Mapa do arquivo (procure pelos títulos "// ----"):
+     1. Abas ................ troca de aba + texto compartilhado
+     2. Cifra ............... reverseText, toGlyphs, fromGlyphs
+     3. Codificar ........... quebra de linha, animação de tinta, render
+     4. Decodificar / Mestre  render de cada aba
+     5. Caixas de texto ..... autoGrow, botão ×, contador de caracteres
+     6. Inverter ............ ordem das palavras / letras das palavras
+     7. Copiar / imagem / .txt / baixar a fonte
+     8. Histórico ........... localStorage (COD / DEC / MES)
+     9. Atalhos, modo apresentação, partículas
+
+   Regras que evitam bugs antigos (não desfazer):
+     - o medidor de largura fica DENTRO do container real (getLineMeasurer)
+     - medir com scrollWidth, nunca getBoundingClientRect().width
+     - a caixa da Decodificar é UMA textarea com direction:rtl (sem espelho)
+   ===================================================================== */
+
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 // ---- tab switching (Codificar / Decodificar / Área do Mestre / Histórico) ----
@@ -764,6 +819,7 @@ const TAB_PAIRS = [
   [btnHistory, panelHistory],
 ];
 function activateTab(btn){
+  const prevBtn = (TAB_PAIRS.find(([b]) => b.classList.contains("active")) || [])[0];
   TAB_PAIRS.forEach(([b, p]) => {
     const active = b === btn;
     b.classList.toggle("active", active);
@@ -774,7 +830,24 @@ function activateTab(btn){
   // rather than leaving whatever was last (possibly incorrectly) computed
   // while it sat hidden — closes the door on any stale-measurement bug
   // instead of just waiting for the user to notice and retype something.
-  if(btn === btnEncode) renderEncode();
+  // Codificar and Área do Mestre work on the same source text: moving
+  // between them carries over whatever was typed (if there is any). The
+  // "input" event re-renders the destination, so it isn't rendered twice.
+  let synced = false;
+  const pair = (prevBtn === btnEncode && btn === btnMaster) || (prevBtn === btnMaster && btn === btnEncode);
+  if(pair){
+    const src = document.getElementById(prevBtn === btnEncode ? "inputEncode" : "inputMaster");
+    const dst = document.getElementById(btn === btnEncode ? "inputEncode" : "inputMaster");
+    if(src.value.trim() && src.value !== dst.value){
+      dst.value = src.value;
+      dst.dispatchEvent(new Event("input", { bubbles: true }));
+      synced = true;
+    }
+  }
+  if(!synced){
+    if(btn === btnEncode) renderEncode();
+    else if(btn === btnMaster) renderMaster();
+  }
 }
 TAB_PAIRS.forEach(([b]) => b.addEventListener("click", () => activateTab(b)));
 document.getElementById("tabs").addEventListener("keydown", (e) => {
@@ -1077,6 +1150,25 @@ function renderMaster(){
 }
 document.getElementById("inputMaster").addEventListener("input", rafThrottle(renderMaster));
 
+// ---- auto-growing textareas (no manual resize handle needed) ----
+function autoGrow(field){
+  field.style.height = "auto";
+  const capped = Math.min(field.scrollHeight, 420);
+  field.style.height = capped + "px";
+  field.style.overflowY = field.scrollHeight > 420 ? "auto" : "hidden";
+}
+const inputEncodeEl = document.getElementById("inputEncode");
+inputEncodeEl.addEventListener("input", () => autoGrow(inputEncodeEl));
+autoGrow(inputEncodeEl);
+
+const inputDecodeEl = document.getElementById("inputDecode");
+inputDecodeEl.addEventListener("input", () => autoGrow(inputDecodeEl));
+autoGrow(inputDecodeEl);
+
+const inputMasterEl = document.getElementById("inputMaster");
+inputMasterEl.addEventListener("input", () => autoGrow(inputMasterEl));
+autoGrow(inputMasterEl);
+
 // ---- clear (×) buttons + character counters ----
 function wireClearButton(clearBtnId, textareaId, countId, renderFn, onAfterChange){
   const btn = document.getElementById(clearBtnId);
@@ -1104,25 +1196,6 @@ wireClearButton("clearEncode", "inputEncode", "countEncode", renderEncode, () =>
 wireClearButton("clearDecode", "inputDecode", "countDecode", renderDecode, () => autoGrow(inputDecodeEl));
 wireClearButton("clearMaster", "inputMaster", "countMaster", renderMaster, () => autoGrow(inputMasterEl));
 
-// ---- auto-growing textareas (no manual resize handle needed) ----
-// ---- auto-growing textareas (no manual resize handle needed) ----
-function autoGrow(field){
-  field.style.height = "auto";
-  const capped = Math.min(field.scrollHeight, 420);
-  field.style.height = capped + "px";
-  field.style.overflowY = field.scrollHeight > 420 ? "auto" : "hidden";
-}
-const inputEncodeEl = document.getElementById("inputEncode");
-inputEncodeEl.addEventListener("input", () => autoGrow(inputEncodeEl));
-autoGrow(inputEncodeEl);
-
-const inputDecodeEl = document.getElementById("inputDecode");
-inputDecodeEl.addEventListener("input", () => autoGrow(inputDecodeEl));
-autoGrow(inputDecodeEl);
-
-const inputMasterEl = document.getElementById("inputMaster");
-inputMasterEl.addEventListener("input", () => autoGrow(inputMasterEl));
-autoGrow(inputMasterEl);
 
 // ---- "inverter ordem das palavras" (Codificar / Decodificar) ----
 // Rewrites the text in the box so the WORDS come in the opposite order
@@ -1164,6 +1237,41 @@ wireFlipButton("flipDecode", "inputDecode");
 // twice restores the original text.
 wireFlipButton("flipLettersEncode", "inputEncode", reverseText);
 wireFlipButton("flipLettersDecode", "inputDecode", reverseText);
+
+// ---- "Testar na Decodificar" ----
+// Puts exactly what the Codificar copy button would copy (the symbols)
+// into the Decodificar box, as if it had been pasted there.
+document.getElementById("sendToDecode").addEventListener("click", () => {
+  const text = document.getElementById("inputEncode").value.trim();
+  if(!text) return;
+  addHistoryEntry("encode", text);
+  activateTab(btnDecode);
+  const dec = document.getElementById("inputDecode");
+  dec.value = toGlyphs(reverseText(text));
+  dec.dispatchEvent(new Event("input", { bubbles: true }));
+});
+
+// ---- download the Cronicas font (read back from the embedded @font-face) ----
+document.getElementById("downloadFont").addEventListener("click", (e) => {
+  const btn = e.currentTarget;
+  const label = btn.querySelector("span");
+  const prev = label.textContent;
+  const css = Array.from(document.querySelectorAll("style")).map(st => st.textContent).join("\n");
+  const m = css.match(/url\(\s*["']?data:font\/ttf;base64,([A-Za-z0-9+\/=]+)/);
+  if(m){
+    const bin = atob(m[1]);
+    const bytes = new Uint8Array(bin.length);
+    for(let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const url = URL.createObjectURL(new Blob([bytes], { type: "font/ttf" }));
+    const a = document.createElement("a");
+    a.href = url; a.download = "Cronicas.ttf"; a.click();
+    URL.revokeObjectURL(url);
+    btn.classList.add("copied"); label.textContent = "Baixado!";
+  } else {
+    label.textContent = "Não foi possível";
+  }
+  setTimeout(() => { btn.classList.remove("copied"); label.textContent = prev; }, 1600);
+});
 
 // ---- copy buttons ----
 // Falls back to the old execCommand trick when the async Clipboard API is
@@ -1212,6 +1320,7 @@ wireCopy("copyDecode", () => {
 });
 wireCopy("copyMaster", () => {
   const text = document.getElementById("inputMaster").value.trim();
+  if(text) addHistoryEntry("master", text);
   return text ? reverseWordsAndLetters(text) : "";
 });
 
@@ -1534,6 +1643,7 @@ document.getElementById("downloadDecodeTxt").addEventListener("click", (e) => {
 document.getElementById("downloadMasterTxt").addEventListener("click", (e) => {
   const text = document.getElementById("inputMaster").value.trim();
   if(!text) return;
+  addHistoryEntry("master", text);
   downloadTextFile("texto-invertido.txt", reverseWordsAndLetters(text));
   flashDownloaded(e.currentTarget);
 });
@@ -1581,21 +1691,28 @@ function renderHistory(){
   container.innerHTML = "";
   list.forEach((entry, i) => {
     const isEncode = entry.type === "encode";
-    const plainPreview = isEncode ? entry.input : fromGlyphs(entry.input);
-    const glyphPreview = isEncode ? toGlyphs(reverseText(entry.input)) : entry.input;
+    const isMaster = entry.type === "master";
+    const plainPreview = (isEncode || isMaster) ? entry.input : fromGlyphs(entry.input);
+    const glyphPreview = isMaster ? reverseWordsAndLetters(entry.input)
+                       : isEncode ? toGlyphs(reverseText(entry.input)) : entry.input;
     const item = document.createElement("div");
     item.className = "history-item";
     item.innerHTML = `
-      <span class="hi-tag">${isEncode ? "COD" : "DEC"}</span>
+      <span class="hi-tag">${isMaster ? "MES" : isEncode ? "COD" : "DEC"}</span>
       <span class="hi-main">
         <div class="hi-plain">${escapeHtml(plainPreview) || "&nbsp;"}</div>
-        <div class="hi-glyph">${escapeHtml(glyphPreview) || "&nbsp;"}</div>
+        <div class="${isMaster ? "hi-master" : "hi-glyph"}">${escapeHtml(glyphPreview) || "&nbsp;"}</div>
       </span>
       <button type="button" class="hi-del" title="Remover" aria-label="Remover">×</button>
     `;
     item.addEventListener("click", (e) => {
       if(e.target.closest(".hi-del")) return;
-      if(isEncode){
+      if(isMaster){
+        btnMaster.click();
+        document.getElementById("inputMaster").value = entry.input;
+        renderMaster();
+        autoGrow(inputMasterEl);
+      } else if(isEncode){
         btnEncode.click();
         document.getElementById("inputEncode").value = entry.input;
         renderEncode();
@@ -1617,12 +1734,19 @@ function renderHistory(){
     container.appendChild(item);
   });
 }
-document.getElementById("inputEncode").addEventListener("blur", () => {
-  addHistoryEntry("encode", document.getElementById("inputEncode").value.trim());
-});
-document.getElementById("inputDecode").addEventListener("blur", () => {
-  addHistoryEntry("decode", document.getElementById("inputDecode").value.trim());
-});
+// Blur saves the entry, except when focus is only moving to one of the
+// "inverter" buttons (the text is about to change; the final version gets
+// saved on the next blur instead of a half-edited one).
+function saveOnBlur(type, id){
+  document.getElementById(id).addEventListener("blur", (e) => {
+    const to = e.relatedTarget;
+    if(to && to.closest && to.closest(".input-tools")) return;
+    addHistoryEntry(type, document.getElementById(id).value.trim());
+  });
+}
+saveOnBlur("encode", "inputEncode");
+saveOnBlur("decode", "inputDecode");
+saveOnBlur("master", "inputMaster");
 document.getElementById("historyClear").addEventListener("click", () => {
   saveHistoryList([]);
   renderHistory();
