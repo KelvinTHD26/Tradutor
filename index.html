@@ -778,7 +778,8 @@ footer .foot-mark{ display:inline-block; margin:0 10px; opacity:.6; transform:tr
    A cifra: cada palavra tem as letras invertidas (a ordem das palavras
    fica) e cada letra vira um símbolo da fonte Cronicas, guardado como
    caractere da área privada do Unicode (U+E000 = A ... U+E019 = Z).
-   Sem maiúsculas/minúsculas, sem números e sem acentos (ã -> a).
+   Sem maiúsculas/minúsculas, sem números e sem acentos (ã -> a, é -> e).
+   O acento é ignorado em TODAS as abas (Codificar, Decodificar, Mestre).
 
    Abas: Codificar · Decodificar · Área do Mestre · Histórico
    Codificar e Área do Mestre compartilham o texto ao trocar de aba.
@@ -946,7 +947,8 @@ function toGlyphs(text){
 }
 function fromGlyphs(text){
   let out = "";
-  for(const ch of text){
+  // O alfabeto não tem acentos; se vier texto acentuado, o acento é ignorado.
+  for(const ch of stripAccents(text)){
     const cp = ch.codePointAt(0);
     if(cp >= PUA_BASE && cp <= PUA_BASE + 25){
       out += String.fromCharCode(97 + (cp - PUA_BASE));
@@ -1119,7 +1121,8 @@ document.getElementById("inputDecode").addEventListener("input", rafThrottle(ren
 // as ONE continuous transform with no width-aware line wrapping — the
 // right form for a single copy/paste value, not for on-screen display.
 function reverseWordsAndLetters(text){
-  return text.split("\n").map(para => {
+  // O alfabeto do RPG não tem acentos: É = E, Ã = A, Ç = C...
+  return stripAccents(text).split("\n").map(para => {
     const words = para.split(/\s+/).filter(Boolean);
     if(words.length === 0) return "";
     return words.map(w => w.split("").reverse().join("")).reverse().join(" ");
@@ -1142,7 +1145,7 @@ function renderMaster(){
   // typed word order, THEN let the width-aware wrapper reverse word order
   // *within each real rendered line*) — just skipping the symbol mapping,
   // so line breaks land in the same correct places as in Codificar.
-  const lettersReversed = reverseText(text);
+  const lettersReversed = reverseText(stripAccents(text));
   const wrapped = wrapLinesForDisplay(lettersReversed, output, "plain-line");
   output.innerHTML = "";
   output.appendChild(line);
